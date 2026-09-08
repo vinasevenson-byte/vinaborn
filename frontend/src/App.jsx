@@ -15,6 +15,8 @@ import { PartnersManagement } from './pages/backoffice/PartnersManagement';
 import { AgencyManagement } from './pages/backoffice/AgencyManagement';
 import { ContractManagement } from './pages/backoffice/ContractManagement';
 import { TicketManagement } from './pages/backoffice/TicketManagement';
+import { RefundsManagement } from './pages/backoffice/RefundsManagement';
+import { AntiScalpingPanel } from './pages/backoffice/AntiScalpingPanel';
 import { Card, Badge } from './components/ui/FormControls';
 
 
@@ -72,9 +74,9 @@ function App() {
               <Route path="agencias" element={<AgencyManagement />} />
               <Route path="contratos" element={<ContractManagement />} />
               <Route path="configuracoes" element={<BackofficePlaceholder title="Configurações Comerciais" wfId="WF-009 a WF-011" description="Definição de taxas de serviço, prazos de saque e liquidação financeira." />} />
-              <Route path="reembolsos" element={<BackofficePlaceholder title="Fila de Reembolsos" wfId="WF-053" description="Triagem e autorização manual de estornos fora do prazo automático de 7 dias." />} />
+              <Route path="reembolsos" element={<RefundsManagement />} />
               <Route path="relatorios" element={<BackofficePlaceholder title="Relatórios Financeiros Globais" wfId="WF-063" description="9 relatórios de fechamento, vendas por período, comissões e exportação em PDF/Excel." />} />
-              <Route path="anti-cambista" element={<BackofficePlaceholder title="Painel Anti-Cambista" wfId="WF-060" description="Monitoramento de compras atípicas por CPF e bloqueio de transferências irregulares." />} />
+              <Route path="anti-cambista" element={<AntiScalpingPanel />} />
               <Route path="cms" element={<BackofficePlaceholder title="CMS Institucional e Banners" wfId="WF-054 / WF-055" description="Gerenciamento de banners da Home, curadoria de avaliações Google Places e páginas institucionais." />} />
               <Route path="notificacoes" element={<BackofficePlaceholder title="Central de Notificações" wfId="WF-056" description="Criação de réguas de automação, disparo de e-mails de voucher e notificações push." />} />
             </Route>

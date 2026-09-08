@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -25,6 +27,8 @@ public class DataInitializer implements CommandLineRunner {
     private final com.curitiba360.curitiba360_api.repository.CouponRepository couponRepository;
     private final com.curitiba360.curitiba360_api.repository.TicketItemRepository ticketItemRepository;
     private final com.curitiba360.curitiba360_api.repository.OrderRepository orderRepository;
+    private final com.curitiba360.curitiba360_api.repository.RefundRepository refundRepository;
+    private final com.curitiba360.curitiba360_api.repository.AntiScalpingRepository antiScalpingRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -43,6 +47,9 @@ public class DataInitializer implements CommandLineRunner {
         }
         if (couponRepository.count() == 0) {
             seedCoupons();
+        }
+        if (refundRepository.count() == 0) {
+            seedRefundsAndAntiScalping();
         }
     }
 
@@ -566,6 +573,108 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
 
         couponRepository.saveAll(List.of(c1, c2, c3, c4));
+    }
+
+    private void seedRefundsAndAntiScalping() {
+        // 1. Reembolsos (WF-053)
+        RefundRequest r1 = RefundRequest.builder()
+                .protocolNumber("RMB-2026-0041")
+                .orderNumber("CWB-2026-00215")
+                .voucherCode("VCH-CWB-2026-3390")
+                .customerName("Lucas Andrade da Silva")
+                .customerCpf("111.999.888-77")
+                .customerEmail("lucas.andrade@email.com")
+                .attractionName("Ópera de Arame e Vale da Música")
+                .amount(new BigDecimal("30.00"))
+                .reason("Tive um imprevisto médico comprovado por atestado anexo e não poderei comparecer a Curitiba na data programada.")
+                .withinLegalDeadline(false) // Compra realizada há 18 dias -> triagem manual
+                .paymentMethod("PIX")
+                .pixKey("111.999.888-77")
+                .status("PENDING_REVIEW")
+                .requestedAt(LocalDateTime.now().minusHours(6))
+                .build();
+
+        RefundRequest r2 = RefundRequest.builder()
+                .protocolNumber("RMB-2026-0038")
+                .orderNumber("CWB-2026-00421")
+                .voucherCode("VCH-CWB-2026-1102")
+                .customerName("Fernanda Souza Meireles")
+                .customerCpf("222.888.777-66")
+                .customerEmail("fernanda.souza@email.com")
+                .attractionName("Passeio de Trem da Serra do Mar")
+                .amount(new BigDecimal("175.00"))
+                .reason("Direito de arrependimento nos 7 dias conforme Artigo 49 do CDC.")
+                .withinLegalDeadline(true) // Compra de ontem -> automático
+                .paymentMethod("PIX")
+                .pixKey("fernanda.souza@email.com")
+                .status("APPROVED")
+                .reviewedBy("Sistema (CDC 7 dias automático)")
+                .decisionNotes("Estorno automático liquidado via chave PIX em conformidade com o prazo legal.")
+                .requestedAt(LocalDateTime.now().minusDays(1))
+                .reviewedAt(LocalDateTime.now().minusDays(1))
+                .build();
+
+        RefundRequest r3 = RefundRequest.builder()
+                .protocolNumber("RMB-2026-0032")
+                .orderNumber("CWB-2026-00109")
+                .voucherCode("VCH-CWB-2026-8840")
+                .customerName("Rodrigo Martins")
+                .customerCpf("333.777.666-55")
+                .customerEmail("rodrigo.martins@email.com")
+                .attractionName("Museu Oscar Niemeyer (MON)")
+                .amount(new BigDecimal("30.00"))
+                .reason("Choveu no dia do passeio e desisti de ir.")
+                .withinLegalDeadline(false)
+                .paymentMethod("CREDIT_CARD")
+                .status("REJECTED")
+                .reviewedBy("Administrador Comercial")
+                .decisionNotes("Condições climáticas comuns não configuram motivo de força maior para cancelamento fora do prazo de 7 dias.")
+                .requestedAt(LocalDateTime.now().minusDays(3))
+                .reviewedAt(LocalDateTime.now().minusDays(2))
+                .build();
+
+        refundRepository.saveAll(List.of(r1, r2, r3));
+
+        // 2. Alertas Anti-Cambista (WF-060 / RN-038)
+        AntiScalpingAlert a1 = AntiScalpingAlert.builder()
+                .cpf("999.888.777-11")
+                .customerName("Marcos Paulo de Oliveira")
+                .customerEmail("marcos.oliveira@tempmail.com")
+                .purchasesThisMonth(14) // Limite: 6
+                .totalTransfers(4) // Limite: 2
+                .riskLevel("HIGH")
+                .triggerReason("Tentativa de compra de 14 ingressos do 1º lote promocional da Ópera com 3 cartões virtuais distintos no mesmo dia.")
+                .blocked(false)
+                .flaggedAt(LocalDateTime.now().minusHours(2))
+                .build();
+
+        AntiScalpingAlert a2 = AntiScalpingAlert.builder()
+                .cpf("444.555.666-00")
+                .customerName("Ingressos CWB Promoções Eireli")
+                .customerEmail("revenda.ingressos@contato.com")
+                .purchasesThisMonth(22)
+                .totalTransfers(9)
+                .riskLevel("BLOCKED")
+                .triggerReason("Revenda secundária não autorizada identificada com transferência em massa de vouchers digitais.")
+                .blocked(true)
+                .flaggedAt(LocalDateTime.now().minusDays(4))
+                .blockedAt(LocalDateTime.now().minusDays(4))
+                .blockedBy("Administrador")
+                .build();
+
+        AntiScalpingAlert a3 = AntiScalpingAlert.builder()
+                .cpf("123.456.789-99")
+                .customerName("Juliana Costa Mendes")
+                .customerEmail("juliana.mendes@email.com")
+                .purchasesThisMonth(7) // Pouco acima do limite (6)
+                .totalTransfers(1)
+                .riskLevel("MEDIUM")
+                .triggerReason("Compra de 7 ingressos para familiares ultrapassando levemente o limite mensal de 6 por CPF.")
+                .blocked(false)
+                .flaggedAt(LocalDateTime.now().minusDays(1))
+                .build();
+
+        antiScalpingRepository.saveAll(List.of(a1, a2, a3));
     }
 }
 
