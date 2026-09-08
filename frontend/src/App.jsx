@@ -20,33 +20,10 @@ import { AntiScalpingPanel } from './pages/backoffice/AntiScalpingPanel';
 import { FinancialReports } from './pages/backoffice/FinancialReports';
 import { CmsManagement } from './pages/backoffice/CmsManagement';
 import { NotificationCenter } from './pages/backoffice/NotificationCenter';
-import { Card, Badge } from './components/ui/FormControls';
+import { UsersManagement } from './pages/backoffice/UsersManagement';
+import { CommercialSettings } from './pages/backoffice/CommercialSettings';
+import { AgentsManagement } from './pages/backoffice/AgentsManagement';
 
-
-// Componente Genérico para Módulos do Backoffice com indicação de Wireframe
-const BackofficePlaceholder = ({ title, wfId, description }) => (
-  <div className="space-y-6">
-    <div>
-      <span className="text-xs font-bold text-sky-600 uppercase tracking-wider">{wfId}</span>
-      <h2 className="text-2xl font-black text-slate-900 tracking-tight">{title}</h2>
-      <p className="text-xs text-slate-500 mt-1">{description}</p>
-    </div>
-    <Card className="p-12 text-center border-dashed border-2 border-slate-200 bg-white space-y-4">
-      <div className="w-16 h-16 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto text-xl font-bold">
-        {wfId.split(' ')[0]}
-      </div>
-      <div className="space-y-1">
-        <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-        <p className="text-sm text-slate-500 max-w-md mx-auto">
-          Módulo integrado à API Java Spring Boot em conformidade com os requisitos do documento SRS.
-        </p>
-      </div>
-      <div className="pt-2">
-        <Badge variant="primary" className="font-semibold">Módulo Pronto para Configuração</Badge>
-      </div>
-    </Card>
-  </div>
-);
 
 function App() {
   return (
@@ -72,11 +49,12 @@ function App() {
               <Route path="validacao" element={<TicketValidator />} />
               <Route path="atracoes" element={<AttractionList />} />
               <Route path="ingressos" element={<TicketManagement />} />
-              <Route path="usuarios" element={<BackofficePlaceholder title="Gestão de Usuários e Perfis" wfId="WF-005 / WF-006" description="Controle de acessos, administradores, parceiros comerciais, agências e agentes." />} />
+              <Route path="usuarios" element={<UsersManagement />} />
               <Route path="parceiros" element={<PartnersManagement />} />
               <Route path="agencias" element={<AgencyManagement />} />
+              <Route path="agentes" element={<AgentsManagement />} />
               <Route path="contratos" element={<ContractManagement />} />
-              <Route path="configuracoes" element={<BackofficePlaceholder title="Configurações Comerciais" wfId="WF-009 a WF-011" description="Definição de taxas de serviço, prazos de saque e liquidação financeira." />} />
+              <Route path="configuracoes" element={<CommercialSettings />} />
               <Route path="reembolsos" element={<RefundsManagement />} />
               <Route path="relatorios" element={<FinancialReports />} />
               <Route path="anti-cambista" element={<AntiScalpingPanel />} />
