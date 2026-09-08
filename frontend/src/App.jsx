@@ -11,7 +11,11 @@ import { Login } from './pages/portal/Login';
 import { Dashboard } from './pages/backoffice/Dashboard';
 import { TicketValidator } from './pages/backoffice/TicketValidator';
 import { AttractionList } from './pages/backoffice/AttractionList';
+import { PartnersManagement } from './pages/backoffice/PartnersManagement';
+import { AgencyManagement } from './pages/backoffice/AgencyManagement';
+import { ContractManagement } from './pages/backoffice/ContractManagement';
 import { Card, Badge } from './components/ui/FormControls';
+
 
 // Componente Genérico para Módulos do Backoffice com indicação de Wireframe
 const BackofficePlaceholder = ({ title, wfId, description }) => (
@@ -62,10 +66,9 @@ function App() {
               <Route path="validacao" element={<TicketValidator />} />
               <Route path="atracoes" element={<AttractionList />} />
               <Route path="usuarios" element={<BackofficePlaceholder title="Gestão de Usuários e Perfis" wfId="WF-005 / WF-006" description="Controle de acessos, administradores, parceiros comerciais, agências e agentes." />} />
-              <Route path="parceiros" element={<BackofficePlaceholder title="Gestão de Parceiros Comerciais" wfId="WF-058 / WF-059" description="Credenciamento, dados fiscais e contratos de donos de atrações." />} />
-              <Route path="agencias" element={<BackofficePlaceholder title="Gestão de Agências de Turismo" wfId="WF-048 / WF-049" description="Cadastro em 3 etapas, aprovação e controle de comissionamento." />} />
-              <Route path="agentes" element={<BackofficePlaceholder title="Gestão de Agentes de Turismo" wfId="WF-050 / WF-064" description="Vínculo de agentes a agências e painéis individuais de vendas." />} />
-              <Route path="contratos" element={<BackofficePlaceholder title="Gestão de Contratos (DocuSign)" wfId="WF-007 / WF-008" description="Assinatura eletrônica de parcerias comerciais com integração DocuSign." />} />
+              <Route path="parceiros" element={<PartnersManagement />} />
+              <Route path="agencias" element={<AgencyManagement />} />
+              <Route path="contratos" element={<ContractManagement />} />
               <Route path="configuracoes" element={<BackofficePlaceholder title="Configurações Comerciais" wfId="WF-009 a WF-011" description="Definição de taxas de serviço, prazos de saque e liquidação financeira." />} />
               <Route path="reembolsos" element={<BackofficePlaceholder title="Fila de Reembolsos" wfId="WF-053" description="Triagem e autorização manual de estornos fora do prazo automático de 7 dias." />} />
               <Route path="relatorios" element={<BackofficePlaceholder title="Relatórios Financeiros Globais" wfId="WF-063" description="9 relatórios de fechamento, vendas por período, comissões e exportação em PDF/Excel." />} />

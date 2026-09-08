@@ -17,6 +17,9 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final AttractionRepository attractionRepository;
+    private final com.curitiba360.curitiba360_api.repository.CommercialPartnerRepository partnerRepository;
+    private final com.curitiba360.curitiba360_api.repository.AgencyRepository agencyRepository;
+    private final com.curitiba360.curitiba360_api.repository.ContractRepository contractRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -26,6 +29,9 @@ public class DataInitializer implements CommandLineRunner {
         }
         if (attractionRepository.count() == 0) {
             seedAttractions();
+        }
+        if (partnerRepository.count() == 0) {
+            seedPartnersAndAgencies();
         }
     }
 
@@ -156,4 +162,117 @@ public class DataInitializer implements CommandLineRunner {
 
         attractionRepository.saveAll(List.of(botanico, opera, mon, trem, tangua));
     }
+
+    private void seedPartnersAndAgencies() {
+        // Parceiro 1: Ativo
+        CommercialPartner madalosso = CommercialPartner.builder()
+                .companyName("Restaurante Madalosso Ltda")
+                .tradeName("Madalosso Santa Felicidade")
+                .cnpj("76.123.456/0001-89")
+                .contactPerson("Carlos Madalosso")
+                .email("contato@madalosso.com.br")
+                .phone("(41) 3372-2121")
+                .address("Av. Manoel Ribas, 5875 - Santa Felicidade")
+                .city("Curitiba")
+                .state("PR")
+                .bankName("Banco Itaú (341)")
+                .bankAgency("0452")
+                .bankAccount("19823-4")
+                .pixKey("76.123.456/0001-89")
+                .status("ACTIVE")
+                .approvedBy("Administrador")
+                .approvedAt(java.time.LocalDateTime.now())
+                .build();
+
+        // Parceiro 2: Pendente de Aprovação (WF-058 Estado 2)
+        CommercialPartner serraVerde = CommercialPartner.builder()
+                .companyName("Serra Verde Express Trens Turísticos S/A")
+                .tradeName("Serra Verde Express")
+                .cnpj("02.987.654/0001-10")
+                .contactPerson("Adonai Arruda Filho")
+                .email("comercial@serraverdeexpress.com.br")
+                .phone("(41) 3888-3488")
+                .address("Av. Presidente Affonso Camargo, 330")
+                .city("Curitiba")
+                .state("PR")
+                .bankName("Banco do Brasil (001)")
+                .bankAgency("1520-2")
+                .bankAccount("38491-0")
+                .pixKey("financeiro@serraverdeexpress.com.br")
+                .status("PENDING_APPROVAL")
+                .build();
+
+        partnerRepository.saveAll(List.of(madalosso, serraVerde));
+
+        // Agência 1: Ativa com comissão apurada
+        Agency cwbTours = Agency.builder()
+                .companyName("Curitiba City Tour & Receptivo Ltda")
+                .tradeName("CWB City Tours")
+                .cnpj("18.444.555/0001-22")
+                .cadastur("18.044.555/0001-PR")
+                .contactPerson("Fernanda Oliveira")
+                .email("operacoes@cwbtours.com.br")
+                .phone("(41) 98822-1100")
+                .address("Rua XV de Novembro, 1200 - Centro")
+                .city("Curitiba")
+                .state("PR")
+                .commissionRate(new BigDecimal("12.00")) // 12%
+                .status("ACTIVE")
+                .approvedAt(java.time.LocalDateTime.now())
+                .totalSalesVolume(new BigDecimal("48600.00"))
+                .totalCommissionAccumulated(new BigDecimal("5832.00"))
+                .bankName("Santander (033)")
+                .bankAgency("3041")
+                .bankAccount("1300892-1")
+                .pixKey("18.444.555/0001-22")
+                .build();
+
+        // Agência 2: Pendente de Aprovação (WF-048 Estado 2)
+        Agency paranaViagens = Agency.builder()
+                .companyName("Paraná Turismo e Eventos Eireli")
+                .tradeName("Paraná Viagens")
+                .cnpj("24.777.888/0001-99")
+                .cadastur("24.077.888/0001-PR")
+                .contactPerson("Roberto Mendes")
+                .email("roberto@paranaviagens.com.br")
+                .phone("(41) 99111-4455")
+                .address("Rua Comendador Araújo, 450 - Batel")
+                .city("Curitiba")
+                .state("PR")
+                .commissionRate(new BigDecimal("10.00"))
+                .status("PENDING_APPROVAL")
+                .build();
+
+        agencyRepository.saveAll(List.of(cwbTours, paranaViagens));
+
+        // Contratos DocuSign vinculados
+        Contract ctrMadalosso = Contract.builder()
+                .contractNumber("CTR-PARC-001-2026")
+                .title("Contrato de Parceria Comercial e Vendas - Restaurante Madalosso")
+                .entityType("PARTNER")
+                .entityId(1L)
+                .entityName("Restaurante Madalosso Ltda")
+                .docusignEnvelopeId("DOCUSIGN-ENV-8841-MADALOSSO")
+                .status("ACTIVE")
+                .signedDate(java.time.LocalDate.now().minusMonths(2))
+                .validUntil(java.time.LocalDate.now().plusMonths(10))
+                .documentPdfUrl("/docs/contratos/madalosso-parceria.pdf")
+                .build();
+
+        Contract ctrCwbTours = Contract.builder()
+                .contractNumber("CTR-AGEN-001-2026")
+                .title("Contrato de Credenciamento e Comissionamento - CWB City Tours")
+                .entityType("AGENCY")
+                .entityId(1L)
+                .entityName("Curitiba City Tour & Receptivo Ltda")
+                .docusignEnvelopeId("DOCUSIGN-ENV-9912-CWBCITYTOURS")
+                .status("ACTIVE")
+                .signedDate(java.time.LocalDate.now().minusMonths(1))
+                .validUntil(java.time.LocalDate.now().plusMonths(11))
+                .documentPdfUrl("/docs/contratos/cwb-tours-credenciamento.pdf")
+                .build();
+
+        contractRepository.saveAll(List.of(ctrMadalosso, ctrCwbTours));
+    }
 }
+
