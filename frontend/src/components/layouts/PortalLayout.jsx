@@ -30,19 +30,13 @@ export const PortalLayout = () => {
       {/* Header Principal */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-6">
-          {/* Logo */}
+          {/* Logo Oficial */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:scale-105 transition-transform">
-              360
-            </div>
-            <div>
-              <span className="font-extrabold text-xl text-slate-900 tracking-tight block">
-                CURITIBA <span className="text-sky-600">360</span>
-              </span>
-              <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase block">
-                Portal Oficial de Experiências
-              </span>
-            </div>
+            <img
+              src="/logos/curitiba360_official_header_logo.png"
+              alt="Curitiba 360"
+              className="h-12 w-auto object-contain group-hover:scale-102 transition-transform"
+            />
           </Link>
 
           {/* Links de Navegação */}
