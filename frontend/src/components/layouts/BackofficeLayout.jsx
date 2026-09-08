@@ -1,0 +1,174 @@
+import React, { useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Briefcase,
+  UserCheck,
+  FileSignature,
+  Settings,
+  Ticket,
+  QrCode,
+  RotateCcw,
+  BarChart3,
+  ShieldAlert,
+  FileText,
+  Bell,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  ChevronDown
+} from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+
+export const BackofficeLayout = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  // Ordem rigorosa definida pela RN-002.02 do SRS
+  const menuItems = [
+    { label: 'Dashboard', path: '/backoffice', icon: LayoutDashboard, badge: null },
+    { label: 'Gestão de Usuários', path: '/backoffice/usuarios', icon: Users, badge: null },
+    { label: 'Parceiros Comerciais', path: '/backoffice/parceiros', icon: Building2, badge: '2' },
+    { label: 'Gestão de Agências', path: '/backoffice/agencias', icon: Briefcase, badge: null },
+    { label: 'Gestão de Agentes', path: '/backoffice/agentes', icon: UserCheck, badge: null },
+    { label: 'Gestão de Contratos', path: '/backoffice/contratos', icon: FileSignature, badge: null },
+    { label: 'Configurações Comerciais', path: '/backoffice/configuracoes', icon: Settings, badge: null },
+    { label: 'Gestão de Atrações', path: '/backoffice/atracoes', icon: Ticket, badge: null },
+    { label: 'Validação de Ingressos', path: '/backoffice/validacao', icon: QrCode, badge: 'QR' },
+    { label: 'Fila de Reembolsos', path: '/backoffice/reembolsos', icon: RotateCcw, badge: '5' },
+    { label: 'Relatórios Financeiros', path: '/backoffice/relatorios', icon: BarChart3, badge: null },
+    { label: 'Controle Anti-Cambista', path: '/backoffice/anti-cambista', icon: ShieldAlert, badge: null },
+    { label: 'Conteúdo (CMS)', path: '/backoffice/cms', icon: FileText, badge: null },
+    { label: 'Notificações', path: '/backoffice/notificacoes', icon: Bell, badge: null },
+  ];
+
+  return (
+    <div className="min-h-screen flex bg-slate-100 text-slate-900">
+      {/* Sidebar Lateral */}
+      <aside
+        className={`bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 fixed inset-y-0 left-0 z-50 ${
+          collapsed ? 'w-20' : 'w-72'
+        }`}
+      >
+        {/* Topo da Sidebar */}
+        <div className="h-20 px-6 flex items-center justify-between border-b border-slate-800">
+          {!collapsed ? (
+            <Link to="/backoffice" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                360
+              </div>
+              <div>
+                <span className="font-extrabold text-lg text-white tracking-tight block">BACKOFFICE</span>
+                <span className="text-[10px] text-amber-400 font-semibold tracking-wider uppercase block">Gestão Curitiba 360</span>
+              </div>
+            </Link>
+          ) : (
+            <div className="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white font-bold text-lg mx-auto">
+              360
+            </div>
+          )}
+
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            title={collapsed ? "Expandir Menu" : "Recolher Menu"}
+          >
+            {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {/* Itens de Menu */}
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-thin scrollbar-thumb-slate-800">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all group relative ${
+                  isActive
+                    ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+                }`}
+                title={collapsed ? item.label : undefined}
+              >
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+                {!collapsed && <span className="truncate flex-1">{item.label}</span>}
+                {!collapsed && item.badge && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Rodapé da Sidebar: Ir para o Portal */}
+        <div className="p-4 border-t border-slate-800">
+          <Link
+            to="/"
+            target="_blank"
+            className={`flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-800 ${
+              collapsed ? 'justify-center' : ''
+            }`}
+          >
+            <ExternalLink className="w-4 h-4 text-sky-400" />
+            {!collapsed && <span>Ver Portal Público</span>}
+          </Link>
+        </div>
+      </aside>
+
+      {/* Área Principal */}
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${collapsed ? 'pl-20' : 'pl-72'}`}>
+        {/* Topbar Superior */}
+        <header className="sticky top-0 z-40 bg-white border-b border-slate-200 h-20 px-8 flex items-center justify-between shadow-xs">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 leading-tight">Painel Administrativo</h1>
+            <p className="text-xs text-slate-500">Módulo e controles de gestão do Curitiba 360</p>
+          </div>
+
+          <div className="flex items-center gap-5">
+            {/* Notificações */}
+            <button className="relative p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+            </button>
+
+            {/* Perfil do Usuário */}
+            <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+              <div className="w-10 h-10 rounded-full bg-sky-100 text-sky-800 font-bold flex items-center justify-center text-sm border border-sky-200">
+                {user?.name ? user.name.charAt(0) : 'A'}
+              </div>
+              <div className="hidden sm:block text-left">
+                <p className="text-sm font-bold text-slate-900 leading-tight">{user?.name || 'Administrador'}</p>
+                <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-200 inline-block mt-0.5">
+                  {user?.role || 'ADMIN'}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-2"
+                title="Encerrar Sessão"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Conteúdo Dinâmico */}
+        <main className="flex-1 p-8">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+};

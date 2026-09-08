@@ -40,10 +40,12 @@ O **Curitiba 360** é uma plataforma integrada de turismo, cultura e entretenime
 - **Utilitários:** `canvas-confetti` (confirmação), `qrcode.react` / `html5-qrcode` (geração e leitura de QR Code na câmera), `date-fns` (formatação de datas).
 
 ### Backend
-- **Ambiente:** Node.js (v20+ LTS).
-- **Framework:** Express / Fastify com arquitetura em camadas (Controller -> Service -> Repository).
-- **Autenticação & Segurança:** JWT (JSON Web Tokens) com Access Token + Refresh Token seguro (HttpOnly Cookies), hashing com `bcryptjs`, proteção com `helmet` e `cors`.
-- **Validação:** Zod ou Joi para validação rigorosa de payloads de entrada.
+- **Linguagem & Plataforma:** Java (v21 / v25 OpenJDK) com **Spring Boot 3**.
+- **Segurança & Autenticação:** Spring Security + JWT (jjwt) com Access Token e Refresh Token, proteção CORS e criptografia BCrypt.
+- **Camada de Dados & Persistência:** Spring Data JPA / Hibernate com PostgreSQL (e H2 embarcado para agilidade de desenvolvimento local).
+- **Validação:** Jakarta Bean Validation (`@Valid`, `@NotNull`, `@NotBlank`, etc.).
+- **Arquitetura:** RESTful API dividida em camadas (`Controller` -> `Service` -> `Repository` -> `Model/Entity`), com DTOs tipados.
+- **Documentação de API:** OpenAPI 3 / Swagger (SpringDoc).
 
 ### Banco de Dados
 - **SGBD:** PostgreSQL (desenvolvimento ágil com SQLite/PostgreSQL e migrations versionadas via Prisma ORM).
