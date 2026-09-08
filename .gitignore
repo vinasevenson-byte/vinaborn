@@ -14,6 +14,7 @@ build/
 .output/
 target/
 *.class
+.vercel/
 
 
 # Environment variables
