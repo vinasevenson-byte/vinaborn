@@ -20,6 +20,11 @@ public class DataInitializer implements CommandLineRunner {
     private final com.curitiba360.curitiba360_api.repository.CommercialPartnerRepository partnerRepository;
     private final com.curitiba360.curitiba360_api.repository.AgencyRepository agencyRepository;
     private final com.curitiba360.curitiba360_api.repository.ContractRepository contractRepository;
+    private final com.curitiba360.curitiba360_api.repository.TicketCategoryRepository ticketCategoryRepository;
+    private final com.curitiba360.curitiba360_api.repository.TicketBatchRepository ticketBatchRepository;
+    private final com.curitiba360.curitiba360_api.repository.CouponRepository couponRepository;
+    private final com.curitiba360.curitiba360_api.repository.TicketItemRepository ticketItemRepository;
+    private final com.curitiba360.curitiba360_api.repository.OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -32,6 +37,12 @@ public class DataInitializer implements CommandLineRunner {
         }
         if (partnerRepository.count() == 0) {
             seedPartnersAndAgencies();
+        }
+        if (ticketCategoryRepository.count() == 0) {
+            seedTicketsAndBatches();
+        }
+        if (couponRepository.count() == 0) {
+            seedCoupons();
         }
     }
 
@@ -273,6 +284,288 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
 
         contractRepository.saveAll(List.of(ctrMadalosso, ctrCwbTours));
+    }
+
+    private void seedTicketsAndBatches() {
+        List<Attraction> attractions = attractionRepository.findAll();
+        if (attractions.isEmpty()) return;
+
+        Attraction opera = attractions.stream()
+                .filter(a -> a.getSlug().contains("opera"))
+                .findFirst()
+                .orElse(attractions.get(0));
+
+        Attraction mon = attractions.stream()
+                .filter(a -> a.getSlug().contains("mon") || a.getSlug().contains("niemeyer"))
+                .findFirst()
+                .orElse(attractions.size() > 1 ? attractions.get(1) : attractions.get(0));
+
+        Attraction trem = attractions.stream()
+                .filter(a -> a.getSlug().contains("trem"))
+                .findFirst()
+                .orElse(attractions.size() > 2 ? attractions.get(2) : attractions.get(0));
+
+        // Categorias e Lotes para Ópera de Arame
+        TicketCategory catOperaInteira = TicketCategory.builder()
+                .attraction(opera)
+                .name("Ingresso Inteira - Acesso Geral")
+                .description("Acesso completo à Ópera de Arame e deck do Vale da Música")
+                .requiresDocumentProof(false)
+                .build();
+        ticketCategoryRepository.save(catOperaInteira);
+
+        TicketBatch batchOpera1 = TicketBatch.builder()
+                .category(catOperaInteira)
+                .name("1º Lote Antecipado")
+                .price(new BigDecimal("15.00"))
+                .originalPrice(new BigDecimal("20.00"))
+                .totalQuantity(300)
+                .availableQuantity(48)
+                .active(true)
+                .build();
+
+        TicketBatch batchOpera2 = TicketBatch.builder()
+                .category(catOperaInteira)
+                .name("2º Lote Regular")
+                .price(new BigDecimal("20.00"))
+                .originalPrice(new BigDecimal("25.00"))
+                .totalQuantity(500)
+                .availableQuantity(500)
+                .active(true)
+                .build();
+
+        TicketCategory catOperaMeia = TicketCategory.builder()
+                .attraction(opera)
+                .name("Meia-Entrada (Estudante / Idoso / PCD / Professor)")
+                .description("Válido mediante apresentação de comprovação legal na catraca")
+                .requiresDocumentProof(true)
+                .build();
+        ticketCategoryRepository.save(catOperaMeia);
+
+        TicketBatch batchOperaMeia = TicketBatch.builder()
+                .category(catOperaMeia)
+                .name("Lote Promocional Meia")
+                .price(new BigDecimal("7.50"))
+                .originalPrice(new BigDecimal("10.00"))
+                .totalQuantity(200)
+                .availableQuantity(85)
+                .active(true)
+                .build();
+
+        // Categorias e Lotes para MON
+        TicketCategory catMonInteira = TicketCategory.builder()
+                .attraction(mon)
+                .name("Ingresso Inteira - Exposições MON")
+                .description("Acesso a todas as salas expositivas e ao Olho")
+                .requiresDocumentProof(false)
+                .build();
+        ticketCategoryRepository.save(catMonInteira);
+
+        TicketBatch batchMon1 = TicketBatch.builder()
+                .category(catMonInteira)
+                .name("1º Lote Cultural")
+                .price(new BigDecimal("30.00"))
+                .originalPrice(new BigDecimal("35.00"))
+                .totalQuantity(400)
+                .availableQuantity(145)
+                .active(true)
+                .build();
+
+        TicketCategory catMonMeia = TicketCategory.builder()
+                .attraction(mon)
+                .name("Meia-Entrada MON")
+                .description("Desconto legal obrigatório")
+                .requiresDocumentProof(true)
+                .build();
+        ticketCategoryRepository.save(catMonMeia);
+
+        TicketBatch batchMonMeia = TicketBatch.builder()
+                .category(catMonMeia)
+                .name("Lote Único Meia")
+                .price(new BigDecimal("15.00"))
+                .originalPrice(new BigDecimal("15.00"))
+                .totalQuantity(250)
+                .availableQuantity(180)
+                .active(true)
+                .build();
+
+        // Categorias e Lotes para Passeio de Trem
+        TicketCategory catTremTuristica = TicketCategory.builder()
+                .attraction(trem)
+                .name("Classe Turística (Curitiba - Morretes)")
+                .description("Viagem panorâmica pela Serra do Mar com serviço de bordo e guia")
+                .requiresDocumentProof(false)
+                .build();
+        ticketCategoryRepository.save(catTremTuristica);
+
+        TicketBatch batchTrem1 = TicketBatch.builder()
+                .category(catTremTuristica)
+                .name("1º Lote Serra do Mar")
+                .price(new BigDecimal("175.00"))
+                .originalPrice(new BigDecimal("195.00"))
+                .totalQuantity(150)
+                .availableQuantity(22)
+                .active(true)
+                .build();
+
+        TicketBatch batchTrem2 = TicketBatch.builder()
+                .category(catTremTuristica)
+                .name("2º Lote Alta Temporada")
+                .price(new BigDecimal("195.00"))
+                .originalPrice(new BigDecimal("210.00"))
+                .totalQuantity(250)
+                .availableQuantity(250)
+                .active(true)
+                .build();
+
+        ticketBatchRepository.saveAll(List.of(
+                batchOpera1, batchOpera2, batchOperaMeia,
+                batchMon1, batchMonMeia,
+                batchTrem1, batchTrem2
+        ));
+
+        // Criar Pedidos e Ingressos Emitidos para visualização e validação (WF-017, WF-018, WF-031)
+        User tourist = userRepository.findByEmail("turista@curitiba360.com.br").orElse(null);
+        if (tourist != null) {
+            Order order1 = Order.builder()
+                    .orderNumber("CWB-2026-00421")
+                    .customer(tourist)
+                    .totalAmount(new BigDecimal("190.00"))
+                    .discountAmount(new BigDecimal("0.00"))
+                    .paymentMethod("PIX")
+                    .status("PAID")
+                    .createdAt(java.time.LocalDateTime.now().minusDays(1))
+                    .build();
+            orderRepository.save(order1);
+
+            TicketItem ticket1 = TicketItem.builder()
+                    .order(order1)
+                    .attraction(opera)
+                    .voucherCode("VCH-CWB-2026-9811")
+                    .holderName("Vinicius Turista da Silva")
+                    .holderDocument("333.444.555-66")
+                    .categoryName("Ingresso Inteira - Acesso Geral")
+                    .price(new BigDecimal("15.00"))
+                    .visitDate(java.time.LocalDate.now().plusDays(2))
+                    .status("VALID")
+                    .build();
+
+            TicketItem ticket2 = TicketItem.builder()
+                    .order(order1)
+                    .attraction(trem)
+                    .voucherCode("VCH-CWB-2026-9812")
+                    .holderName("Mariana Souza Santos")
+                    .holderDocument("444.555.666-77")
+                    .categoryName("Classe Turística (Curitiba - Morretes)")
+                    .price(new BigDecimal("175.00"))
+                    .visitDate(java.time.LocalDate.now().plusDays(2))
+                    .status("VALID")
+                    .build();
+
+            Order order2 = Order.builder()
+                    .orderNumber("CWB-2026-00398")
+                    .customer(tourist)
+                    .totalAmount(new BigDecimal("30.00"))
+                    .discountAmount(BigDecimal.ZERO)
+                    .paymentMethod("CREDIT_CARD")
+                    .status("PAID")
+                    .createdAt(java.time.LocalDateTime.now().minusDays(3))
+                    .build();
+            orderRepository.save(order2);
+
+            TicketItem ticket3 = TicketItem.builder()
+                    .order(order2)
+                    .attraction(mon)
+                    .voucherCode("VCH-CWB-2026-4412")
+                    .holderName("Carlos Alberto Rocha")
+                    .holderDocument("555.666.777-88")
+                    .categoryName("Ingresso Inteira - Exposições MON")
+                    .price(new BigDecimal("30.00"))
+                    .visitDate(java.time.LocalDate.now().minusDays(1))
+                    .status("USED")
+                    .usedAt(java.time.LocalDateTime.now().minusHours(5))
+                    .validatedBy("Catraca MON - Portaria Principal")
+                    .build();
+
+            Order order3 = Order.builder()
+                    .orderNumber("CWB-2026-00215")
+                    .customer(tourist)
+                    .totalAmount(new BigDecimal("15.00"))
+                    .discountAmount(BigDecimal.ZERO)
+                    .paymentMethod("PIX")
+                    .status("CANCELLED")
+                    .createdAt(java.time.LocalDateTime.now().minusDays(7))
+                    .build();
+            orderRepository.save(order3);
+
+            TicketItem ticket4 = TicketItem.builder()
+                    .order(order3)
+                    .attraction(opera)
+                    .voucherCode("VCH-CWB-2026-3390")
+                    .holderName("Renata Figueiredo")
+                    .holderDocument("666.777.888-99")
+                    .categoryName("Meia-Entrada (Estudante / Idoso)")
+                    .price(new BigDecimal("15.00"))
+                    .visitDate(java.time.LocalDate.now().minusDays(6))
+                    .status("CANCELLED")
+                    .build();
+
+            ticketItemRepository.saveAll(List.of(ticket1, ticket2, ticket3, ticket4));
+        }
+    }
+
+    private void seedCoupons() {
+        Coupon c1 = Coupon.builder()
+                .code("CURITIBA360")
+                .discountType("PERCENTAGE")
+                .discountValue(new BigDecimal("10.00"))
+                .minPurchaseAmount(BigDecimal.ZERO)
+                .maxUses(1000)
+                .usedCount(142)
+                .validFrom(java.time.LocalDate.now().minusDays(30))
+                .validUntil(java.time.LocalDate.now().plusMonths(6))
+                .active(true)
+                .build();
+
+        Coupon c2 = Coupon.builder()
+                .code("CWBVERAO")
+                .discountType("FIXED")
+                .discountValue(new BigDecimal("20.00"))
+                .minPurchaseAmount(new BigDecimal("100.00"))
+                .maxUses(300)
+                .usedCount(45)
+                .validFrom(java.time.LocalDate.now().minusDays(10))
+                .validUntil(java.time.LocalDate.now().plusMonths(3))
+                .active(true)
+                .build();
+
+        Coupon c3 = Coupon.builder()
+                .code("AGENCIA-CWB10")
+                .discountType("PERCENTAGE")
+                .discountValue(new BigDecimal("12.00"))
+                .agencyId(1L)
+                .agencyName("CWB City Tours")
+                .maxUses(500)
+                .usedCount(88)
+                .validFrom(java.time.LocalDate.now().minusDays(20))
+                .validUntil(java.time.LocalDate.now().plusMonths(12))
+                .active(true)
+                .build();
+
+        Coupon c4 = Coupon.builder()
+                .code("OPERA15")
+                .discountType("PERCENTAGE")
+                .discountValue(new BigDecimal("15.00"))
+                .attractionId(2L)
+                .attractionName("Ópera de Arame e Vale da Música")
+                .maxUses(200)
+                .usedCount(19)
+                .validFrom(java.time.LocalDate.now().minusDays(5))
+                .validUntil(java.time.LocalDate.now().plusMonths(2))
+                .active(true)
+                .build();
+
+        couponRepository.saveAll(List.of(c1, c2, c3, c4));
     }
 }
 

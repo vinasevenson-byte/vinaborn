@@ -40,4 +40,16 @@ public class TicketBatch {
 
     @Builder.Default
     private boolean active = true;
+
+    public Long getCategoryId() {
+        return category != null ? category.getId() : null;
+    }
+
+    public String getCategoryName() {
+        return category != null ? category.getName() : null;
+    }
+
+    public String getAttractionName() {
+        return (category != null && category.getAttraction() != null) ? category.getAttraction().getName() : null;
+    }
 }

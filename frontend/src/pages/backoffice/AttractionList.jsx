@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, ExternalLink, Star, MapPin, Eye, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Search, Edit2, Trash2, ExternalLink, Star, MapPin, Eye, CheckCircle2, Ticket } from 'lucide-react';
 import { Card, Badge, Input } from '../../components/ui/FormControls';
 import { Button } from '../../components/ui/Button';
 
 export const AttractionList = () => {
+  const navigate = useNavigate();
   const [attractions, setAttractions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -104,10 +106,17 @@ export const AttractionList = () => {
           <p className="text-xs text-slate-500 mt-0.5">Cadastre, edite lotes de ingressos e gerencie a vitrine turística.</p>
         </div>
 
-        <Button onClick={() => setShowModal(true)} variant="primary" className="font-bold gap-2">
-          <Plus className="w-4 h-4" />
-          <span>Cadastrar Nova Atração (WF-013)</span>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button onClick={() => navigate('/backoffice/ingressos')} variant="outline" className="font-bold gap-2">
+            <Ticket className="w-4 h-4 text-sky-600" />
+            <span>Lotes & Cupons (WF-019)</span>
+          </Button>
+
+          <Button onClick={() => setShowModal(true)} variant="primary" className="font-bold gap-2">
+            <Plus className="w-4 h-4" />
+            <span>Cadastrar Nova Atração (WF-013)</span>
+          </Button>
+        </div>
       </div>
 
       {/* Tabela de Listagem */}

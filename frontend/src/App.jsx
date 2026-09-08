@@ -14,6 +14,7 @@ import { AttractionList } from './pages/backoffice/AttractionList';
 import { PartnersManagement } from './pages/backoffice/PartnersManagement';
 import { AgencyManagement } from './pages/backoffice/AgencyManagement';
 import { ContractManagement } from './pages/backoffice/ContractManagement';
+import { TicketManagement } from './pages/backoffice/TicketManagement';
 import { Card, Badge } from './components/ui/FormControls';
 
 
@@ -65,6 +66,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="validacao" element={<TicketValidator />} />
               <Route path="atracoes" element={<AttractionList />} />
+              <Route path="ingressos" element={<TicketManagement />} />
               <Route path="usuarios" element={<BackofficePlaceholder title="Gestão de Usuários e Perfis" wfId="WF-005 / WF-006" description="Controle de acessos, administradores, parceiros comerciais, agências e agentes." />} />
               <Route path="parceiros" element={<PartnersManagement />} />
               <Route path="agencias" element={<AgencyManagement />} />

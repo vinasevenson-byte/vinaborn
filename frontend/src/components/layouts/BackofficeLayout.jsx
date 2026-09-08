@@ -19,7 +19,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Landmark
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -29,7 +30,7 @@ export const BackofficeLayout = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  // Ordem rigorosa definida pela RN-002.02 do SRS
+  // Ordem rigorosa alinhada ao SRS
   const menuItems = [
     { label: 'Dashboard', path: '/backoffice', icon: LayoutDashboard, badge: null },
     { label: 'Gestão de Usuários', path: '/backoffice/usuarios', icon: Users, badge: null },
@@ -38,7 +39,8 @@ export const BackofficeLayout = () => {
     { label: 'Gestão de Agentes', path: '/backoffice/agentes', icon: UserCheck, badge: null },
     { label: 'Gestão de Contratos', path: '/backoffice/contratos', icon: FileSignature, badge: null },
     { label: 'Configurações Comerciais', path: '/backoffice/configuracoes', icon: Settings, badge: null },
-    { label: 'Gestão de Atrações', path: '/backoffice/atracoes', icon: Ticket, badge: null },
+    { label: 'Gestão de Atrações', path: '/backoffice/atracoes', icon: Landmark, badge: null },
+    { label: 'Ingressos & Cupons', path: '/backoffice/ingressos', icon: Ticket, badge: 'WF-017' },
     { label: 'Validação de Ingressos', path: '/backoffice/validacao', icon: QrCode, badge: 'QR' },
     { label: 'Fila de Reembolsos', path: '/backoffice/reembolsos', icon: RotateCcw, badge: '5' },
     { label: 'Relatórios Financeiros', path: '/backoffice/relatorios', icon: BarChart3, badge: null },
