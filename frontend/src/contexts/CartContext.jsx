@@ -61,7 +61,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const subtotal = items.reduce((acc, item) => acc + (Number(item.price) * item.quantity), 0);
-  const discount = coupon ? (subtotal * (coupon.percentage / 100)) : 0;
+  const discount = coupon
+    ? (coupon.discountType === 'FIXED'
+        ? Math.min(subtotal, Number(coupon.discountValue || 0))
+        : (subtotal * (Number(coupon.discountValue || coupon.percentage || 0) / 100)))
+    : 0;
   const total = Math.max(0, subtotal - discount);
 
   return (
