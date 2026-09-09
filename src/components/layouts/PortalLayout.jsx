@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, MapPin, Search, Compass, ShieldCheck, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 export const PortalLayout = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -98,7 +99,9 @@ export const PortalLayout = () => {
 
       {/* Conteúdo da Página */}
       <main className="flex-1">
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       {/* Rodapé Oficial */}

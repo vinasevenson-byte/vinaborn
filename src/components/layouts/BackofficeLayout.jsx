@@ -23,6 +23,7 @@ import {
   Landmark
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 export const BackofficeLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -168,7 +169,9 @@ export const BackofficeLayout = () => {
 
         {/* Conteúdo Dinâmico */}
         <main className="flex-1 p-8">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

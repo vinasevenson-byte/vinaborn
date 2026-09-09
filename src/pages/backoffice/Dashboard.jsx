@@ -36,17 +36,19 @@ export const Dashboard = () => {
 
   useEffect(() => {
     fetch('/api/dashboard/metrics')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setMetrics(prev => ({
-          ...prev,
-          totalRevenue: Number(data.totalRevenue).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-          todayRevenue: Number(data.todayRevenue).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-          activeTickets: data.activeTickets,
-          validatedToday: data.validatedToday,
-          totalAttractions: data.totalAttractions || 5,
-          salesChart: data.salesChart || prev.salesChart
-        }));
+        if (data && typeof data === 'object' && !data.error) {
+          setMetrics(prev => ({
+            ...prev,
+            totalRevenue: data.totalRevenue ? Number(data.totalRevenue).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : prev.totalRevenue,
+            todayRevenue: data.todayRevenue ? Number(data.todayRevenue).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : prev.todayRevenue,
+            activeTickets: data.activeTickets ?? prev.activeTickets,
+            validatedToday: data.validatedToday ?? prev.validatedToday,
+            totalAttractions: data.totalAttractions ?? prev.totalAttractions,
+            salesChart: Array.isArray(data.salesChart) ? data.salesChart : prev.salesChart
+          }));
+        }
       })
       .catch(() => {
         // Dados locais já preenchidos
@@ -149,7 +151,7 @@ export const Dashboard = () => {
           </div>
 
           <div className="h-64 flex items-end justify-between gap-4 pt-8 px-4">
-            {metrics.salesChart.map((bar, idx) => {
+            {(Array.isArray(metrics.salesChart) ? metrics.salesChart : []).map((bar, idx) => {
               const max = 250;
               const heightPercent = Math.min(100, Math.round((bar.vendas / max) * 100));
 

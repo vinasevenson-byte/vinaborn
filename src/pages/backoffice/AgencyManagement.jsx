@@ -52,9 +52,16 @@ export const AgencyManagement = () => {
 
   const loadAgencies = () => {
     fetch('/api/agencies')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setAgencies(data);
+        if (Array.isArray(data)) {
+          setAgencies(data);
+        } else {
+          throw new Error('Invalid data format');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -94,8 +101,17 @@ export const AgencyManagement = () => {
 
   const loadCommissions = () => {
     fetch('/api/agencies/commissions')
-      .then(res => res.json())
-      .then(data => setCommissionsData(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (data && typeof data === 'object' && !data.error) {
+          setCommissionsData(data);
+        } else {
+          throw new Error('Invalid data');
+        }
+      })
       .catch(() => {
         setCommissionsData({
           totalSalesThroughAgencies: 184320.00,
@@ -119,7 +135,7 @@ export const AgencyManagement = () => {
       await fetch(`/api/agencies/${id}/approve`, { method: 'PUT' });
     } catch (e) {}
 
-    setAgencies(prev => prev.map(a => a.id === id ? { ...a, status: 'ACTIVE' } : a));
+    setAgencies(prev => (Array.isArray(prev) ? prev : []).map(a => a.id === id ? { ...a, status: 'ACTIVE' } : a));
   };
 
   const handleFinishWizard = async (e) => {
@@ -134,7 +150,7 @@ export const AgencyManagement = () => {
 
     setAgencies(prev => [
       { ...agencyForm, id: Date.now(), status: 'WAITING_CONTRACT', totalSalesVolume: 0, totalCommissionAccumulated: 0 },
-      ...prev
+      ...(Array.isArray(prev) ? prev : [])
     ]);
     setActiveTab('LIST');
     setWizardStep(1);
@@ -158,10 +174,12 @@ export const AgencyManagement = () => {
     });
   };
 
-  const filteredAgencies = agencies.filter(a =>
-    a.companyName.toLowerCase().includes(search.toLowerCase()) ||
-    a.cnpj.includes(search) ||
-    a.cadastur.includes(search)
+  const safeAgencies = Array.isArray(agencies) ? agencies : [];
+  const filteredAgencies = safeAgencies.filter(a =>
+    !search ||
+    (a.companyName && a.companyName.toLowerCase().includes(search.toLowerCase())) ||
+    (a.cnpj && a.cnpj.includes(search)) ||
+    (a.cadastur && a.cadastur.includes(search))
   );
 
   return (

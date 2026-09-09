@@ -37,8 +37,17 @@ export const CmsManagement = () => {
 
   useEffect(() => {
     fetch('/api/cms/banners')
-      .then(res => res.json())
-      .then(data => setBanners(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setBanners(data);
+        } else {
+          throw new Error('Invalid data');
+        }
+      })
       .catch(() => {
         setBanners([
           {
@@ -63,8 +72,17 @@ export const CmsManagement = () => {
       });
 
     fetch('/api/cms/reviews')
-      .then(res => res.json())
-      .then(data => setReviews(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setReviews(data);
+        } else {
+          throw new Error('Invalid data');
+        }
+      })
       .catch(() => {
         setReviews([
           {
@@ -206,7 +224,7 @@ export const CmsManagement = () => {
       {/* ABA 1: BANNERS (WF-054) */}
       {activeTab === 'banners' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {banners.map((banner) => (
+          {(Array.isArray(banners) ? banners : []).map((banner) => (
             <Card key={banner.id} className="overflow-hidden border-slate-200 p-0 shadow-md flex flex-col justify-between">
               <div className="relative h-48 w-full bg-slate-900">
                 <img
@@ -263,7 +281,7 @@ export const CmsManagement = () => {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {reviews.map((rev) => (
+            {(Array.isArray(reviews) ? reviews : []).map((rev) => (
               <Card key={rev.id} className="p-5 border-slate-200 space-y-3 bg-white shadow-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1 text-amber-500">

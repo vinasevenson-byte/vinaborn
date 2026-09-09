@@ -22,9 +22,16 @@ export const ContractManagement = () => {
 
   const loadContracts = () => {
     fetch('/api/contracts')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setContracts(data);
+        if (Array.isArray(data)) {
+          setContracts(data);
+        } else {
+          throw new Error('Invalid data');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -78,7 +85,7 @@ export const ContractManagement = () => {
       await fetch(`/api/contracts/${id}/send-docusign`, { method: 'POST' });
     } catch (e) {}
 
-    setContracts(prev => prev.map(c => 
+    setContracts(prev => (Array.isArray(prev) ? prev : []).map(c => 
       c.id === id ? { ...c, status: 'SENT', docusignEnvelopeId: `DOCUSIGN-ENV-${Date.now()}` } : c
     ));
   };
@@ -88,15 +95,17 @@ export const ContractManagement = () => {
       await fetch(`/api/contracts/${id}/activate`, { method: 'PUT' });
     } catch (e) {}
 
-    setContracts(prev => prev.map(c => 
+    setContracts(prev => (Array.isArray(prev) ? prev : []).map(c => 
       c.id === id ? { ...c, status: 'ACTIVE', signedDate: new Date().toISOString().split('T')[0] } : c
     ));
   };
 
-  const filteredContracts = contracts.filter(c =>
-    c.title.toLowerCase().includes(search.toLowerCase()) ||
-    c.contractNumber.toLowerCase().includes(search.toLowerCase()) ||
-    c.entityName.toLowerCase().includes(search.toLowerCase())
+  const safeContracts = Array.isArray(contracts) ? contracts : [];
+  const filteredContracts = safeContracts.filter(c =>
+    !search ||
+    (c.title && c.title.toLowerCase().includes(search.toLowerCase())) ||
+    (c.contractNumber && c.contractNumber.toLowerCase().includes(search.toLowerCase())) ||
+    (c.entityName && c.entityName.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (

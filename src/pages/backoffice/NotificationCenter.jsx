@@ -26,8 +26,17 @@ export const NotificationCenter = () => {
 
   useEffect(() => {
     fetch('/api/notifications/templates')
-      .then(res => res.json())
-      .then(data => setTemplates(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTemplates(data);
+        } else {
+          throw new Error('Invalid data');
+        }
+      })
       .catch(() => {
         setTemplates([
           {
@@ -61,8 +70,17 @@ export const NotificationCenter = () => {
       });
 
     fetch('/api/notifications/logs')
-      .then(res => res.json())
-      .then(data => setLogs(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setLogs(data);
+        } else {
+          throw new Error('Invalid data');
+        }
+      })
       .catch(() => {
         setLogs([
           { id: 101, recipient: "vinicius.turista@email.com", template: "Voucher Digital com QR Code", channel: "EMAIL", status: "DELIVERED", sentAt: "10:14:02", duration: "0.8s" },
@@ -143,7 +161,7 @@ export const NotificationCenter = () => {
             </h3>
 
             <div className="space-y-3">
-              {templates.map((tpl) => (
+              {(Array.isArray(templates) ? templates : []).map((tpl) => (
                 <div
                   key={tpl.id}
                   className="p-4 rounded-2xl border border-slate-200 hover:border-slate-300 transition-all bg-white flex flex-col justify-between gap-3 shadow-xs"
@@ -245,7 +263,7 @@ export const NotificationCenter = () => {
             </div>
 
             <div className="divide-y divide-slate-100 text-xs max-h-64 overflow-y-auto">
-              {logs.map((log) => (
+              {(Array.isArray(logs) ? logs : []).map((log) => (
                 <div key={log.id} className="p-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
                   <div>
                     <div className="font-bold text-slate-900">{log.recipient}</div>

@@ -19,9 +19,13 @@ export const AttractionDetails = () => {
 
   useEffect(() => {
     fetch(`/api/attractions/slug/${slug}`)
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setAttraction(data);
+        if (data && data.name && !data.error) {
+          setAttraction(data);
+        } else {
+          throw new Error('Invalid attraction');
+        }
         setLoading(false);
       })
       .catch(() => {

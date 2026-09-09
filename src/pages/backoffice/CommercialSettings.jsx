@@ -38,9 +38,14 @@ export const CommercialSettings = () => {
 
   const loadSettings = () => {
     fetch('/api/settings')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setSettings(prev => ({ ...prev, ...data }));
+        if (data && typeof data === 'object' && !data.error) {
+          setSettings(prev => ({ ...prev, ...data }));
+        }
         setLoading(false);
       })
       .catch(() => {

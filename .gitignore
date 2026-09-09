@@ -23,5 +23,6 @@ target/
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
+*.mv.db
+backend/data/

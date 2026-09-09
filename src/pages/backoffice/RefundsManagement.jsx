@@ -34,9 +34,16 @@ export const RefundsManagement = () => {
 
   const loadRefunds = () => {
     fetch('/api/refunds')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setRefunds(data);
+        if (Array.isArray(data)) {
+          setRefunds(data);
+        } else {
+          throw new Error('Invalid data');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -147,20 +154,21 @@ export const RefundsManagement = () => {
     }
   };
 
-  const filteredRefunds = refunds.filter(r => {
+  const safeRefunds = Array.isArray(refunds) ? refunds : [];
+  const filteredRefunds = safeRefunds.filter(r => {
     const q = search.toLowerCase();
     const matchesQuery = !q ||
-      r.protocolNumber.toLowerCase().includes(q) ||
-      r.customerName.toLowerCase().includes(q) ||
-      r.customerCpf.includes(q) ||
+      (r.protocolNumber && r.protocolNumber.toLowerCase().includes(q)) ||
+      (r.customerName && r.customerName.toLowerCase().includes(q)) ||
+      (r.customerCpf && r.customerCpf.includes(q)) ||
       (r.orderNumber && r.orderNumber.toLowerCase().includes(q));
 
     const matchesStatus = filterStatus === 'ALL' || r.status === filterStatus;
     return matchesQuery && matchesStatus;
   });
 
-  const pendingCount = refunds.filter(r => r.status === 'PENDING_REVIEW').length;
-  const approvedTotal = refunds
+  const pendingCount = safeRefunds.filter(r => r.status === 'PENDING_REVIEW').length;
+  const approvedTotal = safeRefunds
     .filter(r => r.status === 'APPROVED')
     .reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
 

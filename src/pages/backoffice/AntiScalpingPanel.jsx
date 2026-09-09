@@ -39,9 +39,16 @@ export const AntiScalpingPanel = () => {
 
   const loadAlerts = () => {
     fetch('/api/anti-scalping/alerts')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setAlerts(data);
+        if (Array.isArray(data)) {
+          setAlerts(data);
+        } else {
+          throw new Error('Invalid data');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -130,12 +137,13 @@ export const AntiScalpingPanel = () => {
     }
   };
 
-  const filteredAlerts = alerts.filter(a => {
+  const safeAlerts = Array.isArray(alerts) ? alerts : [];
+  const filteredAlerts = safeAlerts.filter(a => {
     const q = search.toLowerCase();
     return !q ||
-      a.cpf.includes(q) ||
-      a.customerName.toLowerCase().includes(q) ||
-      a.customerEmail?.toLowerCase().includes(q);
+      (a.cpf && a.cpf.includes(q)) ||
+      (a.customerName && a.customerName.toLowerCase().includes(q)) ||
+      (a.customerEmail && a.customerEmail.toLowerCase().includes(q));
   });
 
   return (
