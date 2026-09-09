@@ -74,9 +74,13 @@ export const TicketManagement = () => {
   const loadData = () => {
     // 1. Lotes
     fetch('/api/tickets/management/batches')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setBatches(data);
+        if (Array.isArray(data)) {
+          setBatches(data);
+        } else {
+          throw new Error('Not array');
+        }
         setLoadingBatches(false);
       })
       .catch(() => {
@@ -131,8 +135,14 @@ export const TicketManagement = () => {
 
     // 2. Categorias para o modal
     fetch('/api/tickets/management/categories')
-      .then(res => res.json())
-      .then(data => setCategories(data))
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          throw new Error('Not array');
+        }
+      })
       .catch(() => {
         setCategories([
           { id: 1, name: "Ingresso Inteira - Acesso Geral" },
@@ -144,9 +154,13 @@ export const TicketManagement = () => {
 
     // 3. Ingressos Emitidos
     fetch('/api/tickets/management/issued')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setIssuedTickets(data);
+        if (Array.isArray(data)) {
+          setIssuedTickets(data);
+        } else {
+          throw new Error('Not array');
+        }
         setLoadingTickets(false);
       })
       .catch(() => {
@@ -207,9 +221,13 @@ export const TicketManagement = () => {
 
     // 4. Cupons
     fetch('/api/coupons')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setCoupons(data);
+        if (Array.isArray(data)) {
+          setCoupons(data);
+        } else {
+          throw new Error('Not array');
+        }
         setLoadingCoupons(false);
       })
       .catch(() => {
@@ -390,7 +408,11 @@ export const TicketManagement = () => {
   };
 
   // Filtro de Ingressos Emitidos
-  const filteredTickets = issuedTickets.filter(t => {
+  const safeBatches = Array.isArray(batches) ? batches : [];
+  const safeIssuedTickets = Array.isArray(issuedTickets) ? issuedTickets : [];
+  const safeCoupons = Array.isArray(coupons) ? coupons : [];
+
+  const filteredTickets = safeIssuedTickets.filter(t => {
     const q = searchTicket.toLowerCase();
     const matchesQuery =
       !q ||
@@ -472,7 +494,7 @@ export const TicketManagement = () => {
           <BarChart2 className="w-4 h-4" />
           <span>Lotes & Estoque por Categoria</span>
           <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
-            {batches.length}
+            {safeBatches.length}
           </span>
         </button>
 
@@ -487,7 +509,7 @@ export const TicketManagement = () => {
           <Ticket className="w-4 h-4" />
           <span>Ingressos Emitidos & Vouchers</span>
           <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-            {issuedTickets.length}
+            {safeIssuedTickets.length}
           </span>
         </button>
 
@@ -502,7 +524,7 @@ export const TicketManagement = () => {
           <Tag className="w-4 h-4" />
           <span>Cupons Promocionais & Agências</span>
           <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-            {coupons.length}
+            {safeCoupons.length}
           </span>
         </button>
       </div>
@@ -518,7 +540,7 @@ export const TicketManagement = () => {
                 <div>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total de Lotes Ativos</p>
                   <h3 className="text-2xl font-black text-slate-900 mt-1">
-                    {batches.filter(b => b.active).length}
+                    {safeBatches.filter(b => b.active).length}
                   </h3>
                 </div>
                 <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
@@ -532,7 +554,7 @@ export const TicketManagement = () => {
                 <div>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Capacidade Total Alocada</p>
                   <h3 className="text-2xl font-black text-slate-900 mt-1">
-                    {batches.reduce((acc, b) => acc + (b.totalQuantity || 0), 0).toLocaleString('pt-BR')}
+                    {safeBatches.reduce((acc, b) => acc + (b.totalQuantity || 0), 0).toLocaleString('pt-BR')}
                   </h3>
                 </div>
                 <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
@@ -546,7 +568,7 @@ export const TicketManagement = () => {
                 <div>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ingressos Vendidos</p>
                   <h3 className="text-2xl font-black text-slate-900 mt-1">
-                    {batches.reduce((acc, b) => acc + ((b.totalQuantity || 0) - (b.availableQuantity || 0)), 0).toLocaleString('pt-BR')}
+                    {safeBatches.reduce((acc, b) => acc + ((b.totalQuantity || 0) - (b.availableQuantity || 0)), 0).toLocaleString('pt-BR')}
                   </h3>
                 </div>
                 <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
@@ -570,7 +592,7 @@ export const TicketManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {batches.map((batch) => {
+                  {safeBatches.map((batch) => {
                     const sold = (batch.totalQuantity || 0) - (batch.availableQuantity || 0);
                     const percentSold = Math.min(100, Math.round((sold / (batch.totalQuantity || 1)) * 100));
 
@@ -812,7 +834,7 @@ export const TicketManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {coupons.map((coupon) => (
+                  {safeCoupons.map((coupon) => (
                     <tr key={coupon.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">

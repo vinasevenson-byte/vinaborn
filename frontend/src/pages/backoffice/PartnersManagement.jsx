@@ -46,9 +46,16 @@ export const PartnersManagement = () => {
 
   const loadPartners = () => {
     fetch('/api/partners')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setPartners(data);
+        if (Array.isArray(data)) {
+          setPartners(data);
+        } else {
+          throw new Error('Invalid data format');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -150,15 +157,17 @@ export const PartnersManagement = () => {
     setShowCreateModal(false);
   };
 
-  const filteredPartners = partners.filter(p => {
+  const safePartners = Array.isArray(partners) ? partners : [];
+  const filteredPartners = safePartners.filter(p => {
     const matchesTab = activeTab === 'ALL' || p.status === activeTab;
-    const matchesSearch = p.companyName.toLowerCase().includes(search.toLowerCase()) ||
-                          p.cnpj.includes(search) ||
+    const matchesSearch = !search ||
+                          (p.companyName && p.companyName.toLowerCase().includes(search.toLowerCase())) ||
+                          (p.cnpj && p.cnpj.includes(search)) ||
                           (p.tradeName && p.tradeName.toLowerCase().includes(search.toLowerCase()));
     return matchesTab && matchesSearch;
   });
 
-  const pendingCount = partners.filter(p => p.status === 'PENDING_APPROVAL').length;
+  const pendingCount = safePartners.filter(p => p.status === 'PENDING_APPROVAL').length;
 
   return (
     <div className="space-y-8">

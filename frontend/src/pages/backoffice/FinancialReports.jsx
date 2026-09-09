@@ -59,13 +59,27 @@ export const FinancialReports = () => {
 
   useEffect(() => {
     fetch('/api/reports/summary')
-      .then(res => res.json())
-      .then(data => setSummary(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (data && typeof data === 'object' && !data.error) setSummary(data);
+      })
       .catch(() => {});
 
     fetch('/api/reports/sales-by-attraction')
-      .then(res => res.json())
-      .then(data => setSalesByAttraction(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setSalesByAttraction(data);
+        } else {
+          throw new Error('Invalid data');
+        }
+      })
       .catch(() => {
         setSalesByAttraction([
           { attractionName: "Passeio de Trem da Serra do Mar", totalSales: 68250.00, ticketsCount: 390, validCount: 340, usedCount: 45, cancelledCount: 5 },
@@ -76,8 +90,13 @@ export const FinancialReports = () => {
       });
 
     fetch('/api/reports/payment-methods')
-      .then(res => res.json())
-      .then(data => setPaymentMethods(data))
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (data && typeof data === 'object' && !data.error) setPaymentMethods(data);
+      })
       .catch(() => {});
   }, []);
 
@@ -277,7 +296,7 @@ export const FinancialReports = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {salesByAttraction.map((item, i) => {
+                  {(Array.isArray(salesByAttraction) ? salesByAttraction : []).map((item, i) => {
                     const usagePercent = Math.round(((item.usedCount || 0) / (item.ticketsCount || 1)) * 100);
                     return (
                       <tr key={i} className="hover:bg-slate-50/50 transition-colors">

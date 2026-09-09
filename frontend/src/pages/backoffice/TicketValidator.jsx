@@ -123,11 +123,15 @@ export const TicketValidator = () => {
 
     // Carregar atrações para o seletor da catraca
     fetch('/api/attractions')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setAttractions(data);
-        if (data.length > 0 && !selectedAttractionId) {
-          setSelectedAttractionId(String(data[0].id));
+        if (Array.isArray(data)) {
+          setAttractions(data);
+          if (data.length > 0 && !selectedAttractionId) {
+            setSelectedAttractionId(String(data[0].id));
+          }
+        } else {
+          throw new Error('Not array');
         }
       })
       .catch(() => {
@@ -138,6 +142,9 @@ export const TicketValidator = () => {
           { id: 4, name: 'Passeio de Trem da Serra do Mar' },
           { id: 5, name: 'Parque Tanguá' }
         ]);
+        if (!selectedAttractionId) {
+          setSelectedAttractionId('1');
+        }
       });
 
     // Carregar fila offline do localStorage se houver
@@ -415,7 +422,7 @@ export const TicketValidator = () => {
               onChange={(e) => setSelectedAttractionId(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 font-bold text-slate-900 bg-slate-50 focus:bg-white"
             >
-              {attractions.map(a => (
+              {(Array.isArray(attractions) ? attractions : []).map(a => (
                 <option key={a.id} value={a.id}>
                   {a.name}
                 </option>

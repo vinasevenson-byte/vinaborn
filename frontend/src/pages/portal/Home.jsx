@@ -12,9 +12,13 @@ export const Home = () => {
 
   useEffect(() => {
     fetch('/api/attractions')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setAttractions(data);
+        if (Array.isArray(data)) {
+          setAttractions(data);
+        } else {
+          throw new Error('Not array');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -94,9 +98,10 @@ export const Home = () => {
     { id: 'GASTRONOMIA', label: '🍷 Gastronomia' },
   ];
 
-  const filteredAttractions = attractions.filter(att => {
-    const matchesSearch = att.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          att.summary.toLowerCase().includes(searchTerm.toLowerCase());
+  const safeAttractions = Array.isArray(attractions) ? attractions : [];
+  const filteredAttractions = safeAttractions.filter(att => {
+    const matchesSearch = att.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          att.summary?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'ALL' || att.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });

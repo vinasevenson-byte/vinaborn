@@ -35,9 +35,16 @@ export const AgentsManagement = () => {
 
   const loadAgents = () => {
     fetch('/api/agents')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setAgents(data);
+        if (Array.isArray(data)) {
+          setAgents(data);
+        } else {
+          throw new Error('Invalid data format');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -146,17 +153,18 @@ export const AgentsManagement = () => {
     setTimeout(() => setCopiedCode(null), 3000);
   };
 
-  const filteredAgents = agents.filter(a => {
+  const safeAgents = Array.isArray(agents) ? agents : [];
+  const filteredAgents = safeAgents.filter(a => {
     const q = search.toLowerCase();
     return !q ||
-      a.name.toLowerCase().includes(q) ||
-      a.email.toLowerCase().includes(q) ||
-      a.agentCode.toLowerCase().includes(q) ||
-      a.agencyName.toLowerCase().includes(q);
+      (a.name && a.name.toLowerCase().includes(q)) ||
+      (a.email && a.email.toLowerCase().includes(q)) ||
+      (a.agentCode && a.agentCode.toLowerCase().includes(q)) ||
+      (a.agencyName && a.agencyName.toLowerCase().includes(q));
   });
 
-  const totalSales = agents.reduce((acc, a) => acc + (parseFloat(a.totalSales) || 0), 0);
-  const activeCount = agents.filter(a => a.active).length;
+  const totalSales = safeAgents.reduce((acc, a) => acc + (parseFloat(a.totalSales) || 0), 0);
+  const activeCount = safeAgents.filter(a => a.active).length;
 
   return (
     <div className="space-y-8 pb-12">

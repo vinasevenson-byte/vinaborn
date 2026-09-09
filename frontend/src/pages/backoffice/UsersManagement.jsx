@@ -34,9 +34,16 @@ export const UsersManagement = () => {
 
   const loadUsers = () => {
     fetch('/api/users')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(data => {
-        setUsers(data);
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else {
+          throw new Error('Invalid data format');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -58,7 +65,7 @@ export const UsersManagement = () => {
     try {
       await fetch(`/api/users/${id}/toggle-status`, { method: 'PUT' });
     } catch {}
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, active: !u.active } : u));
+    setUsers(prev => (Array.isArray(prev) ? prev : []).map(u => u.id === id ? { ...u, active: !u.active } : u));
   };
 
   const handleCreateUser = async (e) => {
@@ -71,22 +78,23 @@ export const UsersManagement = () => {
       });
       if (res.ok) {
         const saved = await res.json();
-        setUsers(prev => [saved, ...prev]);
+        setUsers(prev => [saved, ...(Array.isArray(prev) ? prev : [])]);
       } else {
         throw new Error();
       }
     } catch {
-      setUsers(prev => [{ ...formData, id: Date.now(), active: true }, ...prev]);
+      setUsers(prev => [{ ...formData, id: Date.now(), active: true }, ...(Array.isArray(prev) ? prev : [])]);
     }
     setShowModal(false);
     setFormData({ name: '', email: '', cpf: '', phone: '', password: '', role: 'ADMIN' });
   };
 
-  const filteredUsers = users.filter(u => {
+  const safeUsers = Array.isArray(users) ? users : [];
+  const filteredUsers = safeUsers.filter(u => {
     const q = search.toLowerCase();
     const matchQuery = !q ||
-      u.name.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q) ||
+      (u.name && u.name.toLowerCase().includes(q)) ||
+      (u.email && u.email.toLowerCase().includes(q)) ||
       (u.cpf && u.cpf.includes(q));
     const matchRole = filterRole === 'ALL' || u.role === filterRole;
     return matchQuery && matchRole;

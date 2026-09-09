@@ -23,9 +23,13 @@ export const AttractionList = () => {
 
   const loadAttractions = () => {
     fetch('/api/attractions')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
-        setAttractions(data);
+        if (Array.isArray(data)) {
+          setAttractions(data);
+        } else {
+          throw new Error('Not array');
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -95,7 +99,8 @@ export const AttractionList = () => {
     });
   };
 
-  const filtered = attractions.filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
+  const safeAttractions = Array.isArray(attractions) ? attractions : [];
+  const filtered = safeAttractions.filter(a => a.name?.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="space-y-8">
