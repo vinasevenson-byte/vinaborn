@@ -61,13 +61,24 @@ export const BackofficeLayout = () => {
         {/* Topo da Sidebar */}
         <div className="h-20 px-6 flex items-center justify-between border-b border-slate-800">
           {!collapsed ? (
-            <Link to="/backoffice" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                360
-              </div>
-              <div>
-                <span className="font-extrabold text-lg text-white tracking-tight block">BACKOFFICE</span>
-                <span className="text-[10px] text-amber-400 font-semibold tracking-wider uppercase block">Gestão Curitiba 360</span>
+            <Link to="/backoffice" className="flex items-center gap-3 py-1">
+              <img
+                src="/logos/official_curitiba360_horizontal.png"
+                alt="Curitiba 360"
+                className="h-10 object-contain max-w-[200px]"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              <div className="hidden items-center gap-2">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                  360
+                </div>
+                <div>
+                  <span className="font-extrabold text-base text-white tracking-tight block">CURITIBA 360</span>
+                  <span className="text-[9px] text-sky-400 font-semibold tracking-wider uppercase block">Experiências • Cultura</span>
+                </div>
               </div>
             </Link>
           ) : (
@@ -135,33 +146,49 @@ export const BackofficeLayout = () => {
         <header className="sticky top-0 z-40 bg-white border-b border-slate-200 h-20 px-8 flex items-center justify-between shadow-xs">
           <div>
             <h1 className="text-xl font-bold text-slate-900 leading-tight">Painel Administrativo</h1>
-            <p className="text-xs text-slate-500">Módulo e controles de gestão do Curitiba 360</p>
+            <p className="text-xs text-slate-500">Visão geral do Curitiba 360</p>
           </div>
 
           <div className="flex items-center gap-5">
+            {/* Seletor de Data */}
+            <div className="relative hidden md:block">
+              <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 text-xs font-semibold text-slate-700 bg-white shadow-xs transition-colors">
+                <span>Hoje</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+            </div>
+
+            {/* Status de Atualização */}
+            <div className="hidden lg:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Atualizado há 2 min</span>
+            </div>
+
             {/* Notificações */}
-            <button className="relative p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+            <button className="relative p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+              <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-white">
+                3
+              </span>
             </button>
 
             {/* Perfil do Usuário */}
             <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
-              <div className="w-10 h-10 rounded-full bg-sky-100 text-sky-800 font-bold flex items-center justify-center text-sm border border-sky-200">
-                {user?.name ? user.name.charAt(0) : 'A'}
+              <div className="w-10 h-10 rounded-full bg-sky-700 text-white font-bold flex items-center justify-center text-sm shadow-xs">
+                A
               </div>
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-bold text-slate-900 leading-tight">{user?.name || 'Administrador'}</p>
-                <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-200 inline-block mt-0.5">
-                  {user?.role || 'ADMIN'}
+                <p className="text-sm font-bold text-slate-900 leading-tight">Administrador</p>
+                <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 inline-block mt-0.5">
+                  ADMIN
                 </span>
               </div>
               <button
                 onClick={logout}
-                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-2"
+                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-1"
                 title="Encerrar Sessão"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-4 h-4" />
               </button>
             </div>
           </div>

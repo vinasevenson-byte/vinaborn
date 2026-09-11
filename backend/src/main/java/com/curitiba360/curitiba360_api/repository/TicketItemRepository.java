@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface TicketItemRepository extends JpaRepository<TicketItem, Long> {
     Optional<TicketItem> findByVoucherCode(String voucherCode);
     List<TicketItem> findByAttractionId(Long attractionId);
+    long countByStatus(String status);
+    long countByStatusAndAttractionId(String status, Long attractionId);
 }
