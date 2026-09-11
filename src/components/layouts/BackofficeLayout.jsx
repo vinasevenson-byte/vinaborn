@@ -20,7 +20,9 @@ import {
   ChevronRight,
   ExternalLink,
   ChevronDown,
-  Landmark
+  Landmark,
+  Megaphone,
+  Magnet
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ErrorBoundary } from '../common/ErrorBoundary';
@@ -41,11 +43,13 @@ export const BackofficeLayout = () => {
     { label: 'Gestão de Contratos', path: '/backoffice/contratos', icon: FileSignature, badge: null },
     { label: 'Configurações Comerciais', path: '/backoffice/configuracoes', icon: Settings, badge: null },
     { label: 'Gestão de Atrações', path: '/backoffice/atracoes', icon: Landmark, badge: null },
-    { label: 'Ingressos & Cupons', path: '/backoffice/ingressos', icon: Ticket, badge: 'WF-017' },
+    { label: 'Ingressos', path: '/backoffice/ingressos', icon: Ticket, badge: 'WF-017' },
     { label: 'Validação de Ingressos', path: '/backoffice/validacao', icon: QrCode, badge: 'QR' },
     { label: 'Fila de Reembolsos', path: '/backoffice/reembolsos', icon: RotateCcw, badge: '5' },
     { label: 'Relatórios Financeiros', path: '/backoffice/relatorios', icon: BarChart3, badge: null },
     { label: 'Controle Anti-Cambista', path: '/backoffice/anti-cambista', icon: ShieldAlert, badge: null },
+    { label: 'Marketing', path: '/backoffice/marketing', icon: Megaphone, badge: 'NOVO', section: 'Tração e Vendas' },
+    { label: 'Remarketing', path: '/backoffice/remarketing', icon: Magnet, badge: 'NOVO' },
     { label: 'Conteúdo (CMS)', path: '/backoffice/cms', icon: FileText, badge: null },
     { label: 'Notificações', path: '/backoffice/notificacoes', icon: Bell, badge: null },
   ];
@@ -103,24 +107,34 @@ export const BackofficeLayout = () => {
             const isActive = location.pathname === item.path;
 
             return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all group relative ${
-                  isActive
-                    ? 'bg-sky-600 text-white font-semibold shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
-                }`}
-                title={collapsed ? item.label : undefined}
-              >
-                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
-                {!collapsed && <span className="truncate flex-1">{item.label}</span>}
-                {!collapsed && item.badge && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    {item.badge}
-                  </span>
+              <React.Fragment key={item.path}>
+                {item.section && !collapsed && (
+                  <div className="mt-5 mb-2 px-3.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    {item.section}
+                  </div>
                 )}
-              </Link>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all group relative ${
+                    isActive
+                      ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+                  {!collapsed && <span className="truncate flex-1">{item.label}</span>}
+                  {!collapsed && item.badge && (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      item.badge === 'NOVO'
+                        ? 'bg-[#009de2] text-white shadow-xs'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              </React.Fragment>
             );
           })}
         </nav>

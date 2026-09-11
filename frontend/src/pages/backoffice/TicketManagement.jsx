@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Ticket,
   Plus,
@@ -819,6 +820,30 @@ export const TicketManagement = () => {
       {/* ========================================================================= */}
       {activeTab === 'coupons' && (
         <div className="space-y-6">
+          {/* Banner de Migração Estratégica para Marketing */}
+          <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                <Tag className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">
+                  Novo Módulo de Aquisição: Marketing & Cupons
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  A inteligência de cupons, geração de links com UTMs de afiliados e campanhas de conversão agora contam com um módulo dedicado no menu lateral.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/backoffice/marketing"
+              className="bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
+            >
+              <span>Ir para Marketing</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
           <Card className="overflow-hidden border-slate-200">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-sm">

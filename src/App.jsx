@@ -23,6 +23,8 @@ import { NotificationCenter } from './pages/backoffice/NotificationCenter';
 import { UsersManagement } from './pages/backoffice/UsersManagement';
 import { CommercialSettings } from './pages/backoffice/CommercialSettings';
 import { AgentsManagement } from './pages/backoffice/AgentsManagement';
+import { MarketingDashboard } from './pages/Marketing/MarketingDashboard';
+import { RemarketingDashboard } from './pages/Remarketing/RemarketingDashboard';
 
 
 function App() {
@@ -58,9 +60,15 @@ function App() {
               <Route path="reembolsos" element={<RefundsManagement />} />
               <Route path="relatorios" element={<FinancialReports />} />
               <Route path="anti-cambista" element={<AntiScalpingPanel />} />
+              <Route path="marketing" element={<MarketingDashboard />} />
+              <Route path="remarketing" element={<RemarketingDashboard />} />
               <Route path="cms" element={<CmsManagement />} />
               <Route path="notificacoes" element={<NotificationCenter />} />
             </Route>
+
+            {/* Atalhos Diretos */}
+            <Route path="/marketing" element={<Navigate to="/backoffice/marketing" replace />} />
+            <Route path="/remarketing" element={<Navigate to="/backoffice/remarketing" replace />} />
 
             {/* Redirecionamento Padrão */}
             <Route path="*" element={<Navigate to="/" replace />} />
