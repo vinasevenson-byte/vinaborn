@@ -21,6 +21,41 @@ import {
   TrendingUp,
   AlertTriangle
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip
+} from 'recharts';
+
+// CustomTooltip premium para o Recharts
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    const faturamento = payload.find(p => p.dataKey === 'faturamento')?.value;
+    const ingressos = payload.find(p => p.dataKey === 'ingressos')?.value;
+
+    return (
+      <div className="bg-white rounded-xl p-3 shadow-xl border border-slate-200/90 text-left z-30 min-w-[140px]">
+        <p className="text-[11px] text-slate-500 font-semibold">{label}</p>
+        {faturamento !== undefined && (
+          <p className="text-xs font-black text-slate-900 mt-1">
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(faturamento)}
+          </p>
+        )}
+        {ingressos !== undefined && (
+          <span className="text-[#00C48C] text-[11px] font-bold block mt-0.5">
+            {ingressos} ingressos
+          </span>
+        )}
+      </div>
+    );
+  }
+  return null;
+};
 
 export const Dashboard = () => {
   // Filtros da tela
@@ -313,132 +348,80 @@ export const Dashboard = () => {
               </div>
             </div>
 
-            {/* Gráfico Visual de Barras + Curva de Ingressos (SVG Overlay) */}
-            <div className="relative pt-6 pb-2">
-              {/* Eixos Verticais */}
-              <div className="flex justify-between text-[11px] font-semibold text-slate-400 absolute inset-x-0 top-6 pointer-events-none">
-                <span>R$ 60 mil</span>
-                <span>2.500</span>
-              </div>
-              <div className="flex justify-between text-[11px] font-semibold text-slate-400 absolute inset-x-0 top-[30%] pointer-events-none">
-                <span>R$ 45 mil</span>
-                <span>2.000</span>
-              </div>
-              <div className="flex justify-between text-[11px] font-semibold text-slate-400 absolute inset-x-0 top-[52%] pointer-events-none">
-                <span>R$ 30 mil</span>
-                <span>1.500</span>
-              </div>
-              <div className="flex justify-between text-[11px] font-semibold text-slate-400 absolute inset-x-0 top-[74%] pointer-events-none">
-                <span>R$ 15 mil</span>
-                <span>1.000</span>
-              </div>
-              <div className="flex justify-between text-[11px] font-semibold text-slate-400 absolute inset-x-0 bottom-12 pointer-events-none">
-                <span>R$ 0</span>
-                <span>0</span>
-              </div>
+            {/* Gráfico Recharts ComposedChart (Barras + Linha Elegante) */}
+            <div className="w-full h-80 pt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart
+                  data={data.salesChart.map(item => ({
+                    ...item,
+                    rotulo: `${item.day} • ${item.date}`
+                  }))}
+                  margin={{ top: 15, right: 15, left: -5, bottom: 5 }}
+                >
+                  {/* Linhas de grade sutis ao fundo */}
+                  <CartesianGrid stroke="#f1f5f9" vertical={false} strokeDasharray="3 3" />
 
-              {/* Área de Linhas Guia */}
-              <div className="h-64 mx-12 border-b border-slate-200 relative flex items-end justify-between px-3">
-                {/* Linhas horizontais sutis */}
-                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none -z-0 opacity-40">
-                  <div className="w-full border-b border-dashed border-slate-200"></div>
-                  <div className="w-full border-b border-dashed border-slate-200"></div>
-                  <div className="w-full border-b border-dashed border-slate-200"></div>
-                  <div className="w-full border-b border-dashed border-slate-200"></div>
-                  <div className="w-full"></div>
-                </div>
-
-                {/* SVG da Curva de Ingressos */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <path
-                    d="M 7 68 L 21 62 L 35 56 L 50 50 L 64 42 L 78 35 L 93 30"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  {/* Eixo X (Dias) */}
+                  <XAxis
+                    dataKey="rotulo"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }}
+                    dy={10}
                   />
-                  {/* Pontos da curva */}
-                  {[
-                    { cx: 7, cy: 68 },
-                    { cx: 21, cy: 62 },
-                    { cx: 35, cy: 56 },
-                    { cx: 50, cy: 50 },
-                    { cx: 64, cy: 42 },
-                    { cx: 78, cy: 35 },
-                    { cx: 93, cy: 30 },
-                  ].map((pt, i) => (
-                    <circle
-                      key={i}
-                      cx={pt.cx}
-                      cy={pt.cy}
-                      r={hoveredIndex === i ? '3.5' : '2.5'}
-                      fill="#10b981"
-                      stroke="#ffffff"
-                      strokeWidth="1.5"
-                    />
-                  ))}
-                </svg>
 
-                {/* Barras de Faturamento */}
-                {data.salesChart.map((col, idx) => {
-                  const isHovered = hoveredIndex === idx;
+                  {/* Eixo Y Esquerda (Faturamento em R$) */}
+                  <YAxis
+                    yAxisId="esquerda"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#009de2', fontSize: 11, fontWeight: 700 }}
+                    tickFormatter={(v) => `R$ ${(v / 1000).toFixed(0)}k`}
+                  />
 
-                  return (
-                    <div
-                      key={idx}
-                      onMouseEnter={() => setHoveredIndex(idx)}
-                      className="w-12 h-full flex flex-col justify-end items-center relative z-10 cursor-pointer group"
-                    >
-                      {/* Tooltip flutuante quando o mouse está sobre a barra (ou default no Domingo) */}
-                      {isHovered && (
-                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white rounded-xl p-2.5 shadow-xl border border-slate-200/90 text-left z-30 min-w-[120px] pointer-events-none animate-fadeIn">
-                          <p className="text-[11px] text-slate-500 font-semibold">{col.day}</p>
-                          <p className="text-xs font-black text-slate-900 mt-0.5">{col.faturamentoFormatted}</p>
-                          <p className="text-[11px] font-bold text-emerald-600 mt-0.5">{col.ingressos} ingressos</p>
-                        </div>
-                      )}
+                  {/* Eixo Y Direita (Quantidade de Ingressos) */}
+                  <YAxis
+                    yAxisId="direita"
+                    orientation="right"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#00C48C', fontSize: 11, fontWeight: 700 }}
+                  />
 
-                      {/* Barra Azul */}
-                      <div
-                        style={{ height: `${col.barHeight}%` }}
-                        className={`w-full rounded-t-md transition-all duration-200 ${
-                          isHovered
-                            ? 'bg-sky-600 shadow-md'
-                            : 'bg-sky-500 group-hover:bg-sky-600'
-                        }`}
-                      ></div>
-                    </div>
-                  );
-                })}
-              </div>
+                  <Tooltip content={<CustomTooltip />} />
 
-              {/* Rótulos dos Dias no Eixo X */}
-              <div className="flex justify-between mx-12 px-3 pt-3 text-center">
-                {data.salesChart.map((col, idx) => (
-                  <div
-                    key={idx}
-                    onMouseEnter={() => setHoveredIndex(idx)}
-                    className="w-12 cursor-pointer"
-                  >
-                    <p className={`text-xs font-bold ${hoveredIndex === idx ? 'text-sky-600' : 'text-slate-700'}`}>
-                      {col.day}
-                    </p>
-                    <p className="text-[10px] text-slate-400 font-medium">{col.date}</p>
-                  </div>
-                ))}
-              </div>
+                  {/* BARRA: Faturamento com topo arredondado */}
+                  <Bar
+                    yAxisId="esquerda"
+                    dataKey="faturamento"
+                    fill="#009de2"
+                    radius={[4, 4, 0, 0]}
+                    barSize={40}
+                  />
+
+                  {/* LINHA: Ingressos (Ponto elegante com interior branco e borda verde) */}
+                  <Line
+                    yAxisId="direita"
+                    type="monotone"
+                    dataKey="ingressos"
+                    stroke="#00C48C"
+                    strokeWidth={3}
+                    dot={{ r: 5, strokeWidth: 3, fill: '#ffffff', stroke: '#00C48C' }}
+                    activeDot={{ r: 7, strokeWidth: 0, fill: '#00C48C' }}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
             </div>
 
             {/* Legenda do Gráfico */}
-            <div className="flex items-center justify-center gap-6 pt-4 text-xs font-semibold text-slate-600">
+            <div className="flex items-center justify-center gap-8 pt-4 text-xs font-semibold">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-sky-500"></span>
-                <span>Faturamento</span>
+                <span className="w-3.5 h-3 rounded-xs bg-[#009de2]"></span>
+                <span className="text-slate-800 font-bold">Faturamento (R$ • Eixo Esquerdo)</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-                <span>Ingressos</span>
+                <span className="w-3.5 h-3.5 rounded-full bg-white border-2 border-[#00C48C]"></span>
+                <span className="text-slate-800 font-bold">Ingressos (Qtd • Eixo Direito)</span>
               </div>
             </div>
           </div>
