@@ -4,7 +4,6 @@ import com.curitiba360.curitiba360_api.model.CommercialPartner;
 import com.curitiba360.curitiba360_api.model.Contract;
 import com.curitiba360.curitiba360_api.repository.CommercialPartnerRepository;
 import com.curitiba360.curitiba360_api.repository.ContractRepository;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

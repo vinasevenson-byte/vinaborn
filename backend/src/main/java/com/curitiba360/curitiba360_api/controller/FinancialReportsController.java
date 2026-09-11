@@ -33,14 +33,14 @@ public class FinancialReportsController {
         List<TicketItem> tickets = ticketItemRepository.findAll();
 
         BigDecimal grossVolume = orders.stream()
-                .filter(o -> "PAID".equalsIgnoreCase(o.getStatus()))
-                .map(Order::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .filter(o -> o != null && "PAID".equalsIgnoreCase(o.getStatus()))
+                .map(o -> o.getTotalAmount() != null ? o.getTotalAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         BigDecimal discountsGiven = orders.stream()
-                .filter(o -> "PAID".equalsIgnoreCase(o.getStatus()))
+                .filter(o -> o != null && "PAID".equalsIgnoreCase(o.getStatus()))
                 .map(o -> o.getDiscountAmount() != null ? o.getDiscountAmount() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         // Taxa da plataforma Curitiba 360 (Take Rate médio 10%)
         BigDecimal platformTakeRate = grossVolume.multiply(new BigDecimal("0.10")).setScale(2, RoundingMode.HALF_UP);
@@ -51,7 +51,7 @@ public class FinancialReportsController {
         // Repasses líquidos a parceiros comerciais
         BigDecimal partnerPayouts = grossVolume.subtract(platformTakeRate).subtract(agencyCommissions);
 
-        long paidOrdersCount = orders.stream().filter(o -> "PAID".equalsIgnoreCase(o.getStatus())).count();
+        long paidOrdersCount = orders.stream().filter(o -> o != null && "PAID".equalsIgnoreCase(o.getStatus())).count();
         BigDecimal avgTicket = paidOrdersCount > 0
                 ? grossVolume.divide(BigDecimal.valueOf(paidOrdersCount), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
@@ -64,7 +64,8 @@ public class FinancialReportsController {
                 "partnerPayouts", partnerPayouts,
                 "totalTransactions", paidOrdersCount,
                 "averageTicket", avgTicket,
-                "totalTicketsIssued", tickets.size()
+                "totalTicketsIssued", tickets.size(),
+                "totalAgencies", agencyRepository.count()
         ));
     }
 
@@ -84,12 +85,12 @@ public class FinancialReportsController {
             List<TicketItem> list = entry.getValue();
 
             BigDecimal total = list.stream()
-                    .map(TicketItem::getPrice)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    .map(t -> (t != null && t.getPrice() != null) ? t.getPrice() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
-            long validCount = list.stream().filter(t -> "VALID".equalsIgnoreCase(t.getStatus())).count();
-            long usedCount = list.stream().filter(t -> "USED".equalsIgnoreCase(t.getStatus())).count();
-            long cancelledCount = list.stream().filter(t -> "CANCELLED".equalsIgnoreCase(t.getStatus())).count();
+            long validCount = list.stream().filter(t -> t != null && "VALID".equalsIgnoreCase(t.getStatus())).count();
+            long usedCount = list.stream().filter(t -> t != null && "USED".equalsIgnoreCase(t.getStatus())).count();
+            long cancelledCount = list.stream().filter(t -> t != null && "CANCELLED".equalsIgnoreCase(t.getStatus())).count();
 
             result.add(Map.of(
                     "attractionName", name,
@@ -107,18 +108,18 @@ public class FinancialReportsController {
     @GetMapping("/payment-methods")
     public ResponseEntity<?> getPaymentMethodsBreakdown() {
         List<Order> orders = orderRepository.findAll().stream()
-                .filter(o -> "PAID".equalsIgnoreCase(o.getStatus()))
+                .filter(o -> o != null && "PAID".equalsIgnoreCase(o.getStatus()))
                 .toList();
 
         BigDecimal pixTotal = orders.stream()
-                .filter(o -> "PIX".equalsIgnoreCase(o.getPaymentMethod()))
-                .map(Order::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .filter(o -> o != null && "PIX".equalsIgnoreCase(o.getPaymentMethod()))
+                .map(o -> o.getTotalAmount() != null ? o.getTotalAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         BigDecimal cardTotal = orders.stream()
-                .filter(o -> !"PIX".equalsIgnoreCase(o.getPaymentMethod()))
-                .map(Order::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .filter(o -> o != null && !"PIX".equalsIgnoreCase(o.getPaymentMethod()))
+                .map(o -> o.getTotalAmount() != null ? o.getTotalAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         long pixCount = orders.stream().filter(o -> "PIX".equalsIgnoreCase(o.getPaymentMethod())).count();
         long cardCount = orders.stream().filter(o -> !"PIX".equalsIgnoreCase(o.getPaymentMethod())).count();

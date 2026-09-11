@@ -1,10 +1,8 @@
 package com.curitiba360.curitiba360_api.controller;
 
-import com.curitiba360.curitiba360_api.model.Attraction;
 import com.curitiba360.curitiba360_api.model.TicketBatch;
 import com.curitiba360.curitiba360_api.model.TicketCategory;
 import com.curitiba360.curitiba360_api.model.TicketItem;
-import com.curitiba360.curitiba360_api.repository.AttractionRepository;
 import com.curitiba360.curitiba360_api.repository.TicketBatchRepository;
 import com.curitiba360.curitiba360_api.repository.TicketCategoryRepository;
 import com.curitiba360.curitiba360_api.repository.TicketItemRepository;
@@ -25,7 +23,6 @@ public class TicketManagementController {
     private final TicketBatchRepository ticketBatchRepository;
     private final TicketCategoryRepository ticketCategoryRepository;
     private final TicketItemRepository ticketItemRepository;
-    private final AttractionRepository attractionRepository;
 
     @GetMapping("/batches")
     public ResponseEntity<List<TicketBatch>> getAllBatches() {

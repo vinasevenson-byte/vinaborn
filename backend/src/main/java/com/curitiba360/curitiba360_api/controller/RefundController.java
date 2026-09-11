@@ -1,7 +1,6 @@
 package com.curitiba360.curitiba360_api.controller;
 
 import com.curitiba360.curitiba360_api.model.RefundRequest;
-import com.curitiba360.curitiba360_api.model.TicketItem;
 import com.curitiba360.curitiba360_api.repository.RefundRepository;
 import com.curitiba360.curitiba360_api.repository.TicketItemRepository;
 import lombok.Data;

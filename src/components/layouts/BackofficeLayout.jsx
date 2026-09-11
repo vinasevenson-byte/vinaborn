@@ -210,7 +210,7 @@ export const BackofficeLayout = () => {
 
         {/* Conteúdo Dinâmico */}
         <main className="flex-1 p-8">
-          <ErrorBoundary>
+          <ErrorBoundary key={location.pathname}>
             <Outlet />
           </ErrorBoundary>
         </main>

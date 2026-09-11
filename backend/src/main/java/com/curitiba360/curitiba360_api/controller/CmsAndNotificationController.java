@@ -1,6 +1,5 @@
 package com.curitiba360.curitiba360_api.controller;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -177,6 +176,7 @@ public class CmsAndNotificationController {
 
         return ResponseEntity.ok(Map.of(
                 "success", true,
+                "template", templateName,
                 "message", "Disparo de teste realizado com sucesso para " + recipient + " em conformidade com o SLA RN-034.08.",
                 "deliveryTimeMs", 640,
                 "timestamp", LocalDateTime.now().toString()

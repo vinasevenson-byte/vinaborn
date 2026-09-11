@@ -240,6 +240,7 @@ export function MarketingDashboard() {
     (c.campanhas?.nome || '').toLowerCase().includes(searchCoupon.toLowerCase()) ||
     (c.promotores?.nome || '').toLowerCase().includes(searchCoupon.toLowerCase())
   );
+  const filteredCoupons = filteredCupons;
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -414,7 +415,7 @@ export function MarketingDashboard() {
                         Carregando cupons do banco de dados...
                       </td>
                     </tr>
-                  ) : filteredCoupons.length === 0 ? (
+                  ) : filteredCupons.length === 0 ? (
                     <tr>
                       <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
                         <Ticket className="w-8 h-8 mx-auto mb-2 opacity-30" />
@@ -422,7 +423,7 @@ export function MarketingDashboard() {
                       </td>
                     </tr>
                   ) : (
-                    filteredCoupons.map((cupom) => (
+                    filteredCupons.map((cupom) => (
                       <tr key={cupom.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#001736]">
                           <div className="flex items-center gap-2">

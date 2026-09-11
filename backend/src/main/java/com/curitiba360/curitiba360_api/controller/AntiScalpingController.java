@@ -2,7 +2,6 @@ package com.curitiba360.curitiba360_api.controller;
 
 import com.curitiba360.curitiba360_api.model.AntiScalpingAlert;
 import com.curitiba360.curitiba360_api.repository.AntiScalpingRepository;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,9 +51,9 @@ public class AntiScalpingController {
     @GetMapping("/stats")
     public ResponseEntity<?> getStats() {
         List<AntiScalpingAlert> all = antiScalpingRepository.findAll();
-        long blockedCount = all.stream().filter(AntiScalpingAlert::isBlocked).count();
-        long highRiskCount = all.stream().filter(a -> "HIGH".equalsIgnoreCase(a.getRiskLevel())).count();
-        int interceptedTickets = all.stream().mapToInt(AntiScalpingAlert::getPurchasesThisMonth).sum();
+        long blockedCount = all.stream().filter(a -> a != null && a.isBlocked()).count();
+        long highRiskCount = all.stream().filter(a -> a != null && "HIGH".equalsIgnoreCase(a.getRiskLevel())).count();
+        int interceptedTickets = all.stream().mapToInt(a -> (a != null && a.getPurchasesThisMonth() != null) ? a.getPurchasesThisMonth() : 0).sum();
 
         return ResponseEntity.ok(Map.of(
                 "monitoredCpfs", all.size(),

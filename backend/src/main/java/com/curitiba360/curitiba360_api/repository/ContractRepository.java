@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface ContractRepository extends JpaRepository<Contract, Long> {
     Optional<Contract> findByContractNumber(String contractNumber);
     List<Contract> findByEntityTypeAndEntityId(String entityType, Long entityId);
+    List<Contract> findByStatus(String status);
     List<Contract> findAllByOrderByCreatedAtDesc();
 }

@@ -1,6 +1,5 @@
 package com.curitiba360.curitiba360_api.controller;
 
-import com.curitiba360.curitiba360_api.model.Attraction;
 import com.curitiba360.curitiba360_api.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @RestController
@@ -38,6 +36,12 @@ public class DashboardController {
 
         long pendingRefunds = refundRepository.findByStatusOrderByRequestedAtDesc("PENDING").size();
         if (pendingRefunds == 0) pendingRefunds = 5;
+
+        long ticketCount = ticketItemRepository.count();
+        long partnerCount = partnerRepository.count();
+        long pendingContracts = contractRepository.findByStatus("PENDING_SIGNATURE").size();
+        long alertsCount = antiScalpingRepository.count();
+        long ordersCount = orderRepository.count();
 
         // Gráfico conforme a imagem e filtros
         List<Map<String, Object>> salesChart = List.of(
@@ -90,16 +94,17 @@ public class DashboardController {
         // 6 KPIs Principais
         response.put("faturamentoHoje", "R$ 38.450,00");
         response.put("faturamentoHojeDelta", "↑ 18,4%");
-        response.put("ingressosVendidos", 1842);
+        response.put("ingressosVendidos", ticketCount > 0 ? ticketCount : 1842);
         response.put("ingressosVendidosDelta", "↑ 12,7%");
-        response.put("clientesAtivos", 1256);
+        response.put("clientesAtivos", totalUsers > 0 ? totalUsers : 1256);
         response.put("clientesAtivosDelta", "↑ 8,2%");
-        response.put("atracoesAtivas", 18);
+        response.put("atracoesAtivas", activeAttractionsCount);
         response.put("lotesAbertos", "3 lotes abertos");
-        response.put("parceirosAtivos", 32);
+        response.put("parceirosAtivos", partnerCount > 0 ? partnerCount : 32);
         response.put("parceirosAtivosDelta", "↑ 6,7%");
-        response.put("pendencias", 7);
+        response.put("pendencias", (pendingRefunds + pendingContracts + alertsCount) > 0 ? (pendingRefunds + pendingContracts) : 7);
         response.put("pendenciasSubtext", "aguardando ação");
+        response.put("pedidosTotais", ordersCount);
 
         // Blocos complementares
         response.put("salesChart", salesChart);

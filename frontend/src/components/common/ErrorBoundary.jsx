@@ -16,9 +16,14 @@ export class ErrorBoundary extends React.Component {
     console.error('ErrorBoundary capturou erro:', error, errorInfo);
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.children !== prevProps.children && this.state.hasError) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+
   handleReset = () => {
     this.setState({ hasError: false, error: null });
-    window.location.reload();
   };
 
   render() {
